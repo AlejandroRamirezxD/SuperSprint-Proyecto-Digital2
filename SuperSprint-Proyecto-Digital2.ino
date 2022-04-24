@@ -74,7 +74,6 @@ int val_Push_Acelerar_J1  = 0;
 +----------------------------------------------------------------------------------+
 */
 // Tiempo
-unsigned char accionBoton;
 unsigned long Tiempo_Inicial_J1;
 unsigned long Tiempo_Final_J1;
 unsigned long Duracion_Boton_J1;
@@ -151,7 +150,6 @@ void setup() {
 // Loop Infinito
 //***************************************************************************************************************************************
 void loop() {
-  accionBoton = !digitalRead(Push_Izquierdo) || !digitalRead(Push_Derecho);
   // Leer estado boton Acelerar J1  
   //val_Push_Acelerar_J1 = digitalRead(Push_Acelerar_J1);
 
@@ -173,9 +171,9 @@ void loop() {
       break;
     }
 
-    /*else if(Tiempo_Transcurrido_Giro >= 30){
+    else if(Tiempo_Transcurrido_Giro >= 30){
       break;
-    }*/
+    }
   }
   //Angulo(Push_Izquierdo, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
   //LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Posicion_Angular_Actual,0,0);
