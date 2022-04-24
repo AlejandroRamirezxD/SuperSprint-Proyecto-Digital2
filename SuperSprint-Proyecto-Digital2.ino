@@ -32,6 +32,9 @@
 #include "font.h"
 #include "lcd_registers.h"
 
+// Funciones de Juego y control
+#include "Funciones_De_Juego.h"
+
 
 /*
 +----------------------------------------------------------------------------------+
@@ -89,9 +92,6 @@ void LCD_Print(String text, int x, int y, int fontSize, int color, int backgroun
 
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
 void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
-
-void Angulo(int Push_Izquierdo, int Push_Derecho, int &Posicion_Angular_Actual, int &Angulo);
-int PosicionMap(int Posicion);
 
 extern uint8_t fondo[];
 //***************************************************************************************************************************************
@@ -639,32 +639,4 @@ void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int
 
   }
   digitalWrite(LCD_CS, HIGH);
-}
-
-
-
-void Angulo(int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual, int *Angulo){
-  if(!digitalRead(Push_Izquierdo)){
-    *Posicion_Angular_Actual = *Posicion_Angular_Actual + 1;
-    
-    if(*Posicion_Angular_Actual  > 31){
-      *Posicion_Angular_Actual = 0;
-    }
-    
-    *Posicion_Angular_Actual = PosicionMap(*Posicion_Angular_Actual);
-  }
-  else if(!digitalRead(Push_Derecho)){
-    *Posicion_Angular_Actual = *Posicion_Angular_Actual - 1;
-    if(*Posicion_Angular_Actual  < -31){
-      *Posicion_Angular_Actual = 0;
-    }
-    *Posicion_Angular_Actual = PosicionMap(*Posicion_Angular_Actual);
-  }   
-}
-int PosicionMap(int Posicion){
-  if(Posicion >= 0){
-    return Posicion;
-  }else if(Posicion >= -31){
-    return Posicion + 32;  
-  }
 }
