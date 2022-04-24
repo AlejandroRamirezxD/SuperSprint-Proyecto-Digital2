@@ -51,6 +51,14 @@ int DPINS[] = {PB_0, PB_1, PB_2, PB_3, PB_4, PB_5, PB_6, PB_7};
 
 // Botones tiva c
 //#define Push_Acelerar_J1  PF_0
+
+struct Jugador{
+  int Posicion_Angular_Actual;
+  int Angulo;
+  
+}
+
+
 #define Push_Derecho  PF_0
 #define Push_Izquierdo PF_4
 int Turno_Push_Derecho = 0;
