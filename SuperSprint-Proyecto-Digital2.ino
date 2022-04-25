@@ -51,15 +51,24 @@ int DPINS[] = {PB_0, PB_1, PB_2, PB_3, PB_4, PB_5, PB_6, PB_7};
 
 // Botones tiva c
 //#define Push_Acelerar_J1  PF_0
-#define Push_Derecho  PF_0
+//#define Push_Derecho  PF_0
 #define Push_Izquierdo PF_4
-int Turno_Push_Derecho = 0;
-int Turno_Push_Izquierdo = 0;
+int Push_Derecho = PF_0;
+
+struct Jugador{
+  int Control_Izquierda;
+  int Control_Derecha;
+  int Control_Acelerador;
+  int Control_Freno;
+  int Control_Retroceso;
+  int Posicion_Angular_Actual;
+  int Angulo;   
+}Primero;
 
 int Posicion_Angular_Actual = 0;
 int Angulo_V = 0;
-int estado_aceleracion_J1 = 0;
-int val_Push_Acelerar_J1  = 0;
+//int estado_aceleracion_J1 = 0;
+//int val_Push_Acelerar_J1  = 0;
 /*
 +----------------------------------------------------------------------------------+
 |                                    VARIABLES                                     |                                   
@@ -104,9 +113,17 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x632C);
+
+ // struct Jugador Primero;
+  Primero.Control_Izquierda = PF_0;
+  Primero.Control_Derecha   = PF_4;
+  
+  
   //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
-  pinMode(Push_Izquierdo, INPUT_PULLUP);
+  pinMode(Primero.Control_Izquierda, INPUT_PULLUP);
   pinMode(Push_Derecho, INPUT_PULLUP);
+
+
     
 //  FillRect(0, 0, 319, 239, 0xFFFF);
 //    FillRect(50, 60, 20, 20, 0xF800);
@@ -136,7 +153,12 @@ void setup() {
 //    LCD_Bitmap(x, 223, 16, 16, tile);
 //    x += 15;
 //    }
+  
+  Primero.Control_Izquierda = PF_0;
+  Primero.Control_Derecha   = PF_4;
+  Primero.Posicion_Angular_Actual = 0;
 
+  
 }
 //***************************************************************************************************************************************
 // Loop Infinito
@@ -148,17 +170,18 @@ void loop() {
   // Ayuda a ver en el monitor serial cuanto tiempo se lleva mientras se pulsa el botón
   //Serial.print("Tiempo pulsado: ");  
   //Serial.println(Duracion_Boton_J1); 
+  
   int Tiempo_Inicial_Giro = millis();
-  while(!digitalRead(Push_Izquierdo) || !digitalRead(Push_Derecho)){
+  while(!digitalRead(Primero.Control_Izquierda) || !digitalRead(Push_Derecho)){
     unsigned long Tiempo_Transcurrido_Giro = millis() - Tiempo_Inicial_Giro;
     if(digitalRead(Push_Derecho)== 0 && Tiempo_Transcurrido_Giro >=20){
-      Angulo(Push_Izquierdo, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
-      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Posicion_Angular_Actual,0,0);
+      Angulo(Primero.Control_Izquierda, Push_Derecho,&Primero.Posicion_Angular_Actual,&Angulo_V);
+      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Primero.Posicion_Angular_Actual,0,0);
       break;
     }
   
-    else if(digitalRead(Push_Izquierdo)== 0 && Tiempo_Transcurrido_Giro >=20){
-      Angulo(Push_Izquierdo, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
+    else if(digitalRead(Primero.Control_Izquierda)== 0 && Tiempo_Transcurrido_Giro >=20){
+      Angulo(Primero.Control_Izquierda, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
       LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Posicion_Angular_Actual,0,0);
       break;
     }
