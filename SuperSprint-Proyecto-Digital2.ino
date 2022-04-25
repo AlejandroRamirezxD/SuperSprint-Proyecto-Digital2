@@ -55,15 +55,48 @@ int DPINS[] = {PB_0, PB_1, PB_2, PB_3, PB_4, PB_5, PB_6, PB_7};
 #define Push_Izquierdo PF_4
 int Push_Derecho = PF_0;
 
+struct control{
+  int Izquierda;
+  int Derecha;
+  int Acelerador;
+  int Freno;
+  };
+
+struct giro{
+  int enGiro;
+  unsigned long tGiro;
+  int Posicion_Angular_Actual;
+  float Angulo;
+  };
+
+struct movimiento{
+  float Aceleracion;
+  unsigned long tAceleracion;
+  float Velocidad;
+  float velX;
+  float velY;
+  int posX;
+  int posY;
+  };
+
 struct Jugador{
-  int Control_Izquierda;
+  control Control;
+  giro Giro;
+  movimiento Movimiento;
+  int accion;
+  /*int Control_Izquierda;
   int Control_Derecha;
   int Control_Acelerador;
   int Control_Freno;
-  int Control_Retroceso;
+  int enGiro
+  int enAceleracion
+  int enDesaceleracion
+  int tGiro
+  int tAcelerador
+  
   int Posicion_Angular_Actual;
-  int Angulo;   
-}Primero;
+  int Angulo;*/   
+}J1;
 
 int Posicion_Angular_Actual = 0;
 int Angulo_V = 0;
@@ -117,13 +150,13 @@ void setup() {
   LCD_Clear(0x632C);
 
  // struct Jugador Primero;
-  Primero.Control_Izquierda = PF_4;
-  Primero.Control_Derecha   = PF_0;
+  J1.Control.Derecha = PF_4;
+  J1.Control.Izquierda = PF_0;
   
   
   //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
-  pinMode(Primero.Control_Izquierda, INPUT_PULLUP);
-  pinMode(Push_Derecho, INPUT_PULLUP);
+  pinMode(J1.Control.Izquierda, INPUT_PULLUP);
+  pinMode(J1.Control.Derecha, INPUT_PULLUP);
 
 
     
@@ -162,17 +195,34 @@ void setup() {
 // Loop Infinito
 //***************************************************************************************************************************************
 void loop() {
-  accionBoton = !digitalRead(Primero.Control_Izquierda) || !digitalRead(Primero.Control_Derecha);
-  // Leer estado boton Acelerar J1  
-  //val_Push_Acelerar_J1 = digitalRead(Push_Acelerar_J1);
-
-  // Ayuda a ver en el monitor serial cuanto tiempo se lleva mientras se pulsa el botón
-  //Serial.print("Tiempo pulsado: ");  
-  //Serial.println(Duracion_Boton_J1); 
-
-  //Medimos el tiempo que se ha invertido en el giro
-  int Tiempo_Inicial_Giro = millis();
-  while(accionBoton){
+  //Primero creamos la variable que nos dice si el usuario toco un boton
+  J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha);
+  
+  if(J1.accion && !J1.Giro.enGiro){
+    /* El usuario pulso un boton de giro
+     * por primera vez
+     */
+    J1.Giro.tGiro = millis();
+    J1.Giro.enGiro = 1;
+  }else if(J1.accion && J1.Giro.enGiro){
+    /*    
+     *     El carro gira cada 20ms
+     */
+    if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=20){
+      Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
+      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+      J1.Giro.tGiro = millis();
+    }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=20){
+      Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
+      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+      J1.Giro.tGiro = millis();
+    }
+    
+  }else if(!J1.accion && J1.Giro.enGiro){
+    J1.Giro.enGiro = 0;  
+  }
+  
+  /*while(accionBoton){
     unsigned long Tiempo_Transcurrido_Giro = millis() - Tiempo_Inicial_Giro;
     if(digitalRead(Primero.Control_Derecha)== 0 && Tiempo_Transcurrido_Giro >=20){
       Angulo(Primero.Control_Izquierda, Primero.Control_Derecha,&Primero.Posicion_Angular_Actual,&Angulo_V);
@@ -188,8 +238,8 @@ void loop() {
 
     /*else if(Tiempo_Transcurrido_Giro >= 30){
       break;
-    }*/
-  }
+    }
+  }*/
   //Angulo(Push_Izquierdo, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
   //LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Posicion_Angular_Actual,0,0);
 

@@ -12,7 +12,7 @@ int PosicionMap(int Posicion){
   }
 }
 
-void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual, int *Angulo ){
+void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual, float *Angulo ){
   if(!digitalRead(Push_Izquierdo)){
     *Posicion_Angular_Actual = *Posicion_Angular_Actual + 1;
     
