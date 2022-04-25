@@ -115,8 +115,8 @@ void setup() {
   LCD_Clear(0x632C);
 
  // struct Jugador Primero;
-  Primero.Control_Izquierda = PF_0;
-  Primero.Control_Derecha   = PF_4;
+  Primero.Control_Izquierda = PF_4;
+  Primero.Control_Derecha   = PF_0;
   
   
   //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
@@ -153,10 +153,6 @@ void setup() {
 //    LCD_Bitmap(x, 223, 16, 16, tile);
 //    x += 15;
 //    }
-  
-  Primero.Control_Izquierda = PF_0;
-  Primero.Control_Derecha   = PF_4;
-  Primero.Posicion_Angular_Actual = 0;
 
   
 }
@@ -170,19 +166,20 @@ void loop() {
   // Ayuda a ver en el monitor serial cuanto tiempo se lleva mientras se pulsa el botón
   //Serial.print("Tiempo pulsado: ");  
   //Serial.println(Duracion_Boton_J1); 
-  
+
+  //Medimos el tiempo que se ha invertido en el giro
   int Tiempo_Inicial_Giro = millis();
-  while(!digitalRead(Primero.Control_Izquierda) || !digitalRead(Push_Derecho)){
+  while(!digitalRead(Primero.Control_Izquierda) || !digitalRead(Primero.Control_Derecha)){
     unsigned long Tiempo_Transcurrido_Giro = millis() - Tiempo_Inicial_Giro;
-    if(digitalRead(Push_Derecho)== 0 && Tiempo_Transcurrido_Giro >=20){
-      Angulo(Primero.Control_Izquierda, Push_Derecho,&Primero.Posicion_Angular_Actual,&Angulo_V);
+    if(digitalRead(Primero.Control_Derecha)== 0 && Tiempo_Transcurrido_Giro >=20){
+      Angulo(Primero.Control_Izquierda, Primero.Control_Derecha,&Primero.Posicion_Angular_Actual,&Angulo_V);
       LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Primero.Posicion_Angular_Actual,0,0);
       break;
     }
   
     else if(digitalRead(Primero.Control_Izquierda)== 0 && Tiempo_Transcurrido_Giro >=20){
-      Angulo(Primero.Control_Izquierda, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
-      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Posicion_Angular_Actual,0,0);
+      Angulo(Primero.Control_Izquierda, Primero.Control_Derecha,&Primero.Posicion_Angular_Actual,&Angulo_V);
+      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Primero.Posicion_Angular_Actual,0,0);
       break;
     }
 
