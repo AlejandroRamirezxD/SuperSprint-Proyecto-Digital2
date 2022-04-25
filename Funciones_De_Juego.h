@@ -22,17 +22,9 @@ void Angulo(int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual, 
     }
     *Posicion_Angular_Actual = PosicionMap(*Posicion_Angular_Actual);
   }   
-
-  if(*Posicion_Angular_Actual = 0){
-    *Angulo = 0;
-  }
-  else if(*Posicion_Angular_Actual > 0 && *Posicion_Angular_Actual <= 26){
-    *Angulo = (*Posicion_Angular_Actual)*10 + 10;
-  }
-  else if(*Posicion_Angular_Actual > 26 && *Posicion_Angular_Actual <= 31){
-    *Angulo = (*Posicion_Angular_Actual-26)*15 + 270;
-  }
 }
+
+
 
 int PosicionMap(int Posicion){
   if(Posicion >= 0){
