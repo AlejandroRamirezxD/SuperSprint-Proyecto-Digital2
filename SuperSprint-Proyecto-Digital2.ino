@@ -153,6 +153,21 @@ void setup() {
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
   J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha) | !digitalRead(J1.Control.Acelerador);
+  Serial.print("Pos angular: ");
+  Serial.print(J1.Giro.Posicion_Angular_Actual);
+  Serial.print(" Angulo: ");
+  Serial.print(J1.Giro.Angulo);
+
+  float AngulitoLIndo = J1.Giro.Angulo*PI/180;
+  float Angulote = AngulitoLIndo;
+
+  Serial.print(" Angulote: ");
+  Serial.print(Angulote);
+  
+  Serial.print(" Coseno: ");
+  Serial.println(cos(Angulote));
+
+  
   if(J1.accion){
     if(!digitalRead(J1.Control.Acelerador) && !J1.Movimiento.enMovimiento){
       J1.Movimiento.tAceleracion = millis();
@@ -164,7 +179,7 @@ void loop() {
         float posX_ini = J1.Movimiento.posX;
         float posY_ini = J1.Movimiento.posY;
         
-        movimientoCarro(posX_ini,posY_ini, 20, 0.01, J1.Giro.Angulo, &J1.Movimiento.posX, &J1.Movimiento.posY);  
+        movimientoCarro(posX_ini,posY_ini, 20, 0.01, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);  
         
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C);
