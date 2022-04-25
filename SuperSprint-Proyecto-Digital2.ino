@@ -786,6 +786,26 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
   }
   digitalWrite(LCD_CS, HIGH);
 }
+
+void LCD_SD(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned nombreArchivo[]) {
+  LCD_CMD(0x02c); // write_memory_start
+  digitalWrite(LCD_RS, HIGH);
+  digitalWrite(LCD_CS, LOW);
+  // abrir archivo
+  
+  unsigned int x2, y2;
+  x2 = x + width;
+  y2 = y + height;
+  SetWindows(x, y, x2 - 1, y2 - 1);
+  unsigned int k = 0;
+  unsigned int i, j;
+
+  while(archivo.available()){
+    LCD_DATA(archivo.read());
+  }
+
+  digitalWrite(LCD_CS, HIGH);
+}
 //***************************************************************************************************************************************
 // Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
 //***************************************************************************************************************************************
