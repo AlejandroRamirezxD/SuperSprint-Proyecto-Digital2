@@ -49,12 +49,12 @@
 #define LCD_RD PE_1
 int DPINS[] = {PB_0, PB_1, PB_2, PB_3, PB_4, PB_5, PB_6, PB_7};
 
-// Botones tiva c
-//#define Push_Acelerar_J1  PF_0
-//#define Push_Derecho  PF_0
-#define Push_Izquierdo PF_4
-int Push_Derecho = PF_0;
-
+/*
++----------------------------------------------------------------------------------+
+|                                VARIABLES Y STRUCTS                               |                                   
++----------------------------------------------------------------------------------+
+*/
+// Sub struct de la variables relacionadas al mando 
 struct control{
   int Izquierda;
   int Derecha;
@@ -62,6 +62,7 @@ struct control{
   int Freno;
   };
 
+// Sub struct de las variables relacionadas al giro
 struct giro{
   int enGiro;
   unsigned long tGiro;
@@ -69,6 +70,7 @@ struct giro{
   float Angulo;
   };
 
+// Sub struct de las variables relacionadas al movimiento
 struct movimiento{
   float Aceleracion;
   unsigned long tAceleracion;
@@ -79,45 +81,14 @@ struct movimiento{
   int posY;
   };
 
+// Super struct que contiene a los sub structs
 struct Jugador{
   control Control;
   giro Giro;
   movimiento Movimiento;
   int accion;
-  /*int Control_Izquierda;
-  int Control_Derecha;
-  int Control_Acelerador;
-  int Control_Freno;
-  int enGiro
-  int enAceleracion
-  int enDesaceleracion
-  int tGiro
-  int tAcelerador
-  
-  int Posicion_Angular_Actual;
-  int Angulo;*/   
 }J1;
 
-int Posicion_Angular_Actual = 0;
-int Angulo_V = 0;
-//int estado_aceleracion_J1 = 0;
-//int val_Push_Acelerar_J1  = 0;
-
-int accionBoton;
-/*
-+----------------------------------------------------------------------------------+
-|                                    VARIABLES                                     |                                   
-+----------------------------------------------------------------------------------+
-*/
-// Tiempo
-unsigned long Tiempo_Inicial_J1;
-unsigned long Tiempo_Final_J1;
-unsigned long Duracion_Boton_J1;
-float Turno_Boton_J1;
-float PosI_J1 = 50;
-float VelI_J1 = 0;
-float VelF_J1 = 0;
-float AclI_J1 = 0.0000015; //u/s^2 
 /*
 +----------------------------------------------------------------------------------+
 |                              PROTOTIPO DE FUNCIONES                              |                                                                      
@@ -137,7 +108,8 @@ void LCD_Print(String text, int x, int y, int fontSize, int color, int backgroun
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
 void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
 
-extern uint8_t fondo[];
+extern uint8_t Pista1[];
+//extern uint8_t P_Inicio [];
 //***************************************************************************************************************************************
 // Inicialización
 //***************************************************************************************************************************************
@@ -148,8 +120,10 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x632C);
+  
+  //LCD_Bitmap(0, 0, 320, 240, P_Inicio);
+  delay(5000);
 
- // struct Jugador Primero;
   J1.Control.Derecha = PF_4;
   J1.Control.Izquierda = PF_0;
   
@@ -178,7 +152,7 @@ void setup() {
   
   
   //LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
-  LCD_Bitmap(0, 0, 320, 240, fondo);
+  LCD_Bitmap(0, 0, 320, 240, Pista1);
   LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
 //  for(int x = 0; x <319; x++){
 //    LCD_Bitmap(x, 116, 16, 16, tile);
