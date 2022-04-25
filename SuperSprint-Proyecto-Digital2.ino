@@ -73,6 +73,7 @@ struct giro{
 // Sub struct de las variables relacionadas al movimiento
 struct movimiento{
   float Aceleracion;
+  int enMovimiento;
   unsigned long tAceleracion;
   float Velocidad;
   float velX;
@@ -125,43 +126,24 @@ void setup() {
   delay(5000);
 
   J1.Control.Derecha = PF_4;
-  J1.Control.Izquierda = PF_0;
-  
+  J1.Control.Izquierda = PA_4;
+  J1.Control.Acelerador = PF_0;
+
+  J1.Giro.enGiro = 0;
+  J1.Movimiento.enMovimiento = 0;
+
+  J1.Movimiento.posX = 50;
+  J1.Movimiento.posY = 180;
   
   //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
   pinMode(J1.Control.Izquierda, INPUT_PULLUP);
   pinMode(J1.Control.Derecha, INPUT_PULLUP);
-
+  pinMode(J1.Control.Acelerador, INPUT_PULLUP);
 
     
-//  FillRect(0, 0, 319, 239, 0xFFFF);
-//    FillRect(50, 60, 20, 20, 0xF800);
-//    FillRect(70, 60, 20, 20, 0x07E0);
-//    FillRect(90, 60, 20, 20, 0x001F);
 
-  //FillRect(0, 0, 319, 206, 0x74DA);
-  //String text1 = "Hola Mundo";
-  //LCD_Print(text1, 20, 100, 2, 0x001F, 0xCAB9);
-
-
-  //LCD_Bitmap(60, 100, 32, 32, prueba);
-  //LCD_Print(text1, 20, 100, 2, 0xffff, 0x421b);
-  //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
-  //LCD_Sprite(60,100,32,32,pesaSprite,4,3,0,1);
-
-  
-  
-  //LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
   LCD_Bitmap(0, 0, 320, 240, Pista1);
   LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
-//  for(int x = 0; x <319; x++){
-//    LCD_Bitmap(x, 116, 16, 16, tile);
-////    LCD_Bitmap(x, 68, 16, 16, tile);
-////
-//    LCD_Bitmap(x, 207, 16, 16, tile);
-//    LCD_Bitmap(x, 223, 16, 16, tile);
-//    x += 15;
-//    }
 
   
 }
@@ -170,32 +152,65 @@ void setup() {
 //***************************************************************************************************************************************
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
-  J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha);
-  
-  if(J1.accion && !J1.Giro.enGiro){
-    /* El usuario pulso un boton de giro
-     * por primera vez
-     */
-    J1.Giro.tGiro = millis();
-    J1.Giro.enGiro = 1;
-  }else if(J1.accion && J1.Giro.enGiro){
-    /*    
-     *     El carro gira cada 20ms
-     */
-    if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=20){
-      Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
-      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-      J1.Giro.tGiro = millis();
-    }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=20){
-      Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
-      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-      J1.Giro.tGiro = millis();
+  J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha | !digitalRead(J1.Control.Acelerador));
+  if(J1.accion){
+    if(!digitalRead(J1.Control.Acelerador)&&!J1.Movimiento.enMovimiento){
+      J1.Movimiento.tAceleracion = millis();
+      J1.Movimiento.enMovimiento = 1;   
+    }else if(!digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
+      if(!digitalRead(J1.Control.Acelerador)&&(millis()-J1.Movimiento.tAceleracion)>=20){
+        int posX_ini = J1.Movimiento.posX;
+        int posY_ini = J1.Movimiento.posY;
+        movimientoCarro(J1.Movimiento.posX, J1.Movimiento.posY, 20, 0.4, 0, &J1.Movimiento.posX, &J1.Movimiento.posY);  
+        Serial.print("Posicion inicial: ");
+        Serial.print(posX_ini);
+        Serial.print(",");
+        Serial.println(posY_ini);
+        Serial.print("Posicion inicial: ");
+        Serial.print(J1.Movimiento.posX);
+        Serial.print(",");
+        Serial.println(J1.Movimiento.posY);
+        Serial.println("");
+        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0);
+        V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C);
+      }    
+    }else if(digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
+      J1.Movimiento.enMovimiento = 0;  
     }
-    
-  }else if(!J1.accion && J1.Giro.enGiro){
-    J1.Giro.enGiro = 0;  
+    if(J1.accion && !J1.Giro.enGiro){
+      /* El usuario pulso un boton de giro
+       * por primera vez
+       */
+      J1.Giro.tGiro = millis();
+      J1.Giro.enGiro = 1;
+    }else if(J1.accion && J1.Giro.enGiro){
+      /*    
+       *     El carro gira cada 20ms
+       */
+      if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=20){
+        Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
+        LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+        J1.Giro.tGiro = millis();
+        Serial.print("Posicion inicial: ");
+        Serial.print(J1.Movimiento.posX);
+        Serial.print(",");
+        Serial.println(J1.Movimiento.posY);
+        Serial.println("");
+      }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=20){
+        Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
+        LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+        J1.Giro.tGiro = millis();
+        Serial.print("Posicion inicial: ");
+        Serial.print(J1.Movimiento.posX);
+        Serial.print(",");
+        Serial.println(J1.Movimiento.posY);
+        Serial.println("");
+      }
+      
+    }else if(!J1.accion && J1.Giro.enGiro){
+      J1.Giro.enGiro = 0;  
+    }
   }
-  
   /*while(accionBoton){
     unsigned long Tiempo_Transcurrido_Giro = millis() - Tiempo_Inicial_Giro;
     if(digitalRead(Primero.Control_Derecha)== 0 && Tiempo_Transcurrido_Giro >=20){

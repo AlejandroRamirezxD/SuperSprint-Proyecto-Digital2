@@ -41,4 +41,9 @@ void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual,
   }
 }
 
+void movimientoCarro(int x_ini, int y_ini,unsigned long t_refresco,float velocidad, float angulo, int *x_f, int *y_f){
+  *x_f = x_ini + t_refresco*velocidad*cos(angulo);
+  *y_f = y_ini + t_refresco*velocidad*sin(angulo);
+}
+
 #endif
