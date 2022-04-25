@@ -50,10 +50,12 @@
 int DPINS[] = {PB_0, PB_1, PB_2, PB_3, PB_4, PB_5, PB_6, PB_7};
 
 // Botones tiva c
-//#define Push_Acelerar_J1  PF_0
+#define Push_Acelerar_J1  PF_0
 //#define Push_Derecho  PF_0
-#define Push_Izquierdo PF_4
-int Push_Derecho = PF_0;
+//#define Push_Izquierdo PF_4
+//int Push_Derecho = PF_0;
+
+
 
 struct Jugador{
   int Control_Izquierda;
@@ -121,9 +123,9 @@ void setup() {
   Primero.Control_Derecha   = PF_0;
   
   
-  //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
-  pinMode(Primero.Control_Izquierda, INPUT_PULLUP);
-  pinMode(Push_Derecho, INPUT_PULLUP);
+  pinMode(Push_Acelerar_J1,INPUT_PULLUP);
+  //pinMode(Primero.Control_Izquierda, INPUT_PULLUP);
+  //pinMode(Push_Derecho, INPUT_PULLUP);
 
 
     
@@ -162,7 +164,7 @@ void setup() {
 // Loop Infinito
 //***************************************************************************************************************************************
 void loop() {
-  accionBoton = !digitalRead(Primero.Control_Izquierda) || !digitalRead(Primero.Control_Derecha);
+  /*accionBoton = !digitalRead(Primero.Control_Izquierda) || !digitalRead(Primero.Control_Derecha);
   // Leer estado boton Acelerar J1  
   //val_Push_Acelerar_J1 = digitalRead(Push_Acelerar_J1);
 
@@ -189,15 +191,15 @@ void loop() {
     /*else if(Tiempo_Transcurrido_Giro >= 30){
       break;
     }*/
-  }
+  
   //Angulo(Push_Izquierdo, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
   //LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Posicion_Angular_Actual,0,0);
 
   
 // Medio aceleron, esta no tiene implementado el giro. Y no toma en cuenta la velocidad inicial al acelerar OJO
-/*
+
   // Bucle cuando se preciona acelerador
-  while(!val_Push_Acelerar_J1){
+  while(!digitalRead(Push_Acelerar_J1)){
     
      // La unica funcion de este while que contiene otro while, es contar con una variable
      // que tenga el tiempo inicial (variable Tiempo_Inicial_J1) y luego compararla con la 
@@ -205,7 +207,7 @@ void loop() {
      // obtiene el tiempo de duracion. Esta resta se actualiza constantemente dentro del 
      // while de bajo es el que va actualizando el valor de la duracion del boton apachado.
     
-    val_Push_Acelerar_J1 = digitalRead(Push_Acelerar_J1); // Leer estado boton acelerador
+    int val_Push_Acelerar_J1 = digitalRead(Push_Acelerar_J1); // Leer estado boton acelerador
     Tiempo_Inicial_J1 = millis(); //Pasar el valor del millis al tiempo inicial
     //Duracion_Boton_J1 = 0;
     // Actualiza la resta de tiempos constantemente
@@ -247,7 +249,7 @@ void loop() {
     }
   }
 
-*/
+
 }
   
   /*
