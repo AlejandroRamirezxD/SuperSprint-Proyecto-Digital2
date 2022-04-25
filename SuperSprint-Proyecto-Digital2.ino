@@ -176,10 +176,16 @@ void setup() {
   // Variables para entrar en las condiciones
   J1.Giro.enGiro = 0;
   J1.Movimiento.enMovimiento = 0;
-
+  
   // Definir pos inicial de carrito 
   J1.Movimiento.posX = 50;
   J1.Movimiento.posY = 180;
+
+  //Definimos el valor de angulo inicial del carro
+  J1.Giro.Posicion_Angular_Actual = 0;
+  J1.Giro.Angulo = 0;
+  compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
+  
   
   //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
   pinMode(J1.Control.Izquierda, INPUT_PULLUP);
@@ -256,15 +262,14 @@ void loop() {
         
         if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){
           Serial.print("uwu");
-          J1.Movimiento.Velocidad = -J1.Movimiento.Velocidad;
+          J1.Movimiento.velX = -J1.Movimiento.velX;
                     
         }
         if(posY_ini < Pista1.Limites.yo || posY_ini > Pista1.Limites.yf){ 
-          J1.Movimiento.Velocidad = -J1.Movimiento.Velocidad;        
+          J1.Movimiento.velY = -J1.Movimiento.velY;        
           Serial.print("entra");
           }
-
-        movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);          
+        movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 
       }    
@@ -300,6 +305,7 @@ void loop() {
              
       if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
+        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
         /*
@@ -311,6 +317,7 @@ void loop() {
         */
       }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
+        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
         /*
