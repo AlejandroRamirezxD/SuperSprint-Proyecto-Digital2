@@ -149,10 +149,10 @@ void setup() {
 
   // Limites asociados a la pista1
   // Borde exterior
-  Pista1.Limites.xo = 45;
+  Pista1.Limites.xo = 48;
   Pista1.Limites.xf = 255;
-  Pista1.Limites.yo = 40;
-  Pista1.Limites.yf = 203;
+  Pista1.Limites.yo = 42;
+  Pista1.Limites.yf = 201;
 
   // Borde interior
   Pista1.Limites.xio = 72;
