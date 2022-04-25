@@ -78,8 +78,8 @@ struct movimiento{
   float Velocidad;
   float velX;
   float velY;
-  int posX;
-  int posY;
+  float posX;
+  float posY;
   };
 
 // Super struct que contiene a los sub structs
@@ -123,7 +123,7 @@ void setup() {
   LCD_Clear(0x632C);
   
   //LCD_Bitmap(0, 0, 320, 240, P_Inicio);
-  delay(5000);
+  //delay(5000);
 
   J1.Control.Derecha = PF_4;
   J1.Control.Izquierda = PA_4;
@@ -143,7 +143,7 @@ void setup() {
     
 
   LCD_Bitmap(0, 0, 320, 240, Pista1);
-  LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
+  LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
 
   
 }
@@ -152,31 +152,29 @@ void setup() {
 //***************************************************************************************************************************************
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
-  J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha | !digitalRead(J1.Control.Acelerador));
+  J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha) | !digitalRead(J1.Control.Acelerador);
   if(J1.accion){
-    if(!digitalRead(J1.Control.Acelerador)&&!J1.Movimiento.enMovimiento){
+    if(!digitalRead(J1.Control.Acelerador) && !J1.Movimiento.enMovimiento){
       J1.Movimiento.tAceleracion = millis();
       J1.Movimiento.enMovimiento = 1;   
-    }else if(!digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
+    }
+    
+    else if(!digitalRead(J1.Control.Acelerador) && J1.Movimiento.enMovimiento){
       if(!digitalRead(J1.Control.Acelerador)&&(millis()-J1.Movimiento.tAceleracion)>=20){
-        int posX_ini = J1.Movimiento.posX;
-        int posY_ini = J1.Movimiento.posY;
-        movimientoCarro(J1.Movimiento.posX, J1.Movimiento.posY, 20, 0.4, 0, &J1.Movimiento.posX, &J1.Movimiento.posY);  
-        Serial.print("Posicion inicial: ");
-        Serial.print(posX_ini);
-        Serial.print(",");
-        Serial.println(posY_ini);
-        Serial.print("Posicion inicial: ");
-        Serial.print(J1.Movimiento.posX);
-        Serial.print(",");
-        Serial.println(J1.Movimiento.posY);
-        Serial.println("");
+        float posX_ini = J1.Movimiento.posX;
+        float posY_ini = J1.Movimiento.posY;
+        
+        movimientoCarro(posX_ini,posY_ini, 20, 0.01, 0, &J1.Movimiento.posX, &J1.Movimiento.posY);  
+        
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0);
         V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C);
       }    
-    }else if(digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
+    }
+    
+    else if(digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
       J1.Movimiento.enMovimiento = 0;  
     }
+    
     if(J1.accion && !J1.Giro.enGiro){
       /* El usuario pulso un boton de giro
        * por primera vez
