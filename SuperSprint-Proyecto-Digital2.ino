@@ -79,6 +79,8 @@ struct movimiento{
   int enMovimiento;
   unsigned long tAceleracion;
   float Velocidad;
+  float velX;
+  float velY;
   float posX;
   float posY;
   };
