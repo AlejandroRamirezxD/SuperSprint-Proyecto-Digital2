@@ -2,7 +2,7 @@
 #define Funciones_De_Juego_h
 
 int PosicionMap(int Posicion);
-void Angulo(int Push_Izquierdo,int Push_Derecho,int *Posicion_Angular_Actual,int *Angulo);
+void Angulo(int Push_Izquierdo,int Push_Derecho,int *PosicionAngular,int *Angulo);
 void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velocidadY);
 void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float velocidad, float angulo, float *x_f, float *y_f);
 
@@ -14,25 +14,32 @@ int PosicionMap(int Posicion){
   }
 }
 
-void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual, float *Angulo ){
+void Angulo (int Push_Izquierdo, int Push_Derecho, int *PosicionAngular, float *Angulo ){
   if(!digitalRead(Push_Izquierdo)){
-    *Posicion_Angular_Actual = *Posicion_Angular_Actual + 1;
+    *Angulo = *Angulo + 1;
     
-    if(*Posicion_Angular_Actual  > 31){
-      *Posicion_Angular_Actual = 0;
+    if(*Angulo  >= 360){
+      *Angulo = 0;
     }
     
-    *Posicion_Angular_Actual = PosicionMap(*Posicion_Angular_Actual);
   }
   else if(!digitalRead(Push_Derecho)){
-    *Posicion_Angular_Actual = *Posicion_Angular_Actual - 1;
-    if(*Posicion_Angular_Actual  < -31){
-      *Posicion_Angular_Actual = 0;
+    *Angulo = *Angulo - 1;
+    if(*Angulo  < 0){
+      *Angulo = 359;
     }
-    *Posicion_Angular_Actual = PosicionMap(*Posicion_Angular_Actual);
   }
-
-  if(*Posicion_Angular_Actual == 0){
+  if(*Angulo == 0){
+    *PosicionAngular = 0;  
+  }
+  else if(*Angulo>=0 && *Angulo <=270){
+    *PosicionAngular = (*Angulo - 10)/10;
+  }
+  else if(*Angulo>270 && *Angulo <360){
+    *PosicionAngular = (*Angulo - 270)/15 + 26;  
+  }
+  
+  /*if(*Posicion_Angular_Actual == 0){
     *Angulo = 0;    
   }
   else if(*Posicion_Angular_Actual > 0 && *Posicion_Angular_Actual <= 26){
@@ -40,7 +47,7 @@ void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual,
   }
   else if(*Posicion_Angular_Actual > 26 && *Posicion_Angular_Actual <= 31){
     *Angulo = (*Posicion_Angular_Actual-26)*15 + 270;
-  }
+  }*/
 }
 
 void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velocidadY){

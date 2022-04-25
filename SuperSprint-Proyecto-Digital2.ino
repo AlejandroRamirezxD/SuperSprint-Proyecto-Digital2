@@ -169,7 +169,7 @@ void setup() {
   J1.Control.Drift      = PA_2;
 
   // Valores de maniobra
-  J1.Control.rateGiro   = 60;
+  J1.Control.rateGiro   = 3;
   J1.Control.turnoDrift = 0;
   J1.Movimiento.Velocidad =  0.009;
 
@@ -304,10 +304,13 @@ void loop() {
       }
              
       if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
+        Serial.println(J1.Giro.Posicion_Angular_Actual);
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
         compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
+        Serial.println(J1.Giro.Posicion_Angular_Actual);
+        Serial.println();
         /*
         Serial.print("Posicion inicial: ");
         Serial.print(J1.Movimiento.posX);
