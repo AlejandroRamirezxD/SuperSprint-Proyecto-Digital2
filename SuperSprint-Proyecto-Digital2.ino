@@ -252,13 +252,14 @@ void loop() {
           
         }
         
-        else if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){
+        if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){
           Serial.print("uwu");
-            J1.Movimiento.Velocidad = -J1.Movimiento.Velocidad;
+          J1.Movimiento.Velocidad = -J1.Movimiento.Velocidad;
                     
-        }else if(posY_ini > Pista1.Limites.yo || posY_ini < Pista1.Limites.yf){ 
-            J1.Movimiento.Velocidad = -J1.Movimiento.Velocidad;        
-            Serial.print("entra");
+        }
+        if(posY_ini < Pista1.Limites.yo || posY_ini > Pista1.Limites.yf){ 
+          J1.Movimiento.Velocidad = -J1.Movimiento.Velocidad;        
+          Serial.print("entra");
           }
 
         movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);          
