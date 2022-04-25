@@ -200,7 +200,7 @@ void loop() {
       /*    
        *     El carro gira cada 20ms
        */
-      if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=20){
+      if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=60){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
@@ -209,7 +209,7 @@ void loop() {
         Serial.print(",");
         Serial.println(J1.Movimiento.posY);
         Serial.println("");
-      }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=20){
+      }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=60){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
