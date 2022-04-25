@@ -79,8 +79,6 @@ struct movimiento{
   int enMovimiento;
   unsigned long tAceleracion;
   float Velocidad;
-  float velX;
-  float velY;
   float posX;
   float posY;
   };
@@ -92,6 +90,27 @@ struct Jugador{
   movimiento Movimiento;
   int accion;
 }J1;
+
+struct limites{
+  float xo;
+  float xf;
+  float yo;
+  float yf;
+  float xio;
+  float xif;
+  float yio;
+  float yif;
+};
+
+
+// Struct dedicado a los limites de pista 1
+struct Pista{
+  limites Limites;
+}Pista1;
+
+
+
+
 
 /*
 +----------------------------------------------------------------------------------+
@@ -112,7 +131,7 @@ void LCD_Print(String text, int x, int y, int fontSize, int color, int backgroun
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
 void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
 
-extern uint8_t Pista1[];
+extern uint8_t Mapa_Pista1[];
 //extern uint8_t P_Inicio [];
 //***************************************************************************************************************************************
 // Inicialización
@@ -128,16 +147,35 @@ void setup() {
   //LCD_Bitmap(0, 0, 320, 240, P_Inicio);
   //delay(5000);
 
+  // Limites asociados a la pista1
+  // Borde exterior
+  Pista1.Limites.xo = 45;
+  Pista1.Limites.xf = 255;
+  Pista1.Limites.yo = 40;
+  Pista1.Limites.yf = 203;
+
+  // Borde interior
+  Pista1.Limites.xio = 72;
+  Pista1.Limites.xif = 231;
+  Pista1.Limites.yio = 169;
+  Pista1.Limites.yif = 73;
+  
+  // Pines asociados a botones
   J1.Control.Derecha    = PA_4;
   J1.Control.Izquierda  = PA_3;
   J1.Control.Acelerador = PF_0;
   J1.Control.Drift      = PA_2;
+
+  // Valores de maniobra
   J1.Control.rateGiro   = 60;
   J1.Control.turnoDrift = 0;
-  
+  J1.Movimiento.Velocidad =  0.009;
+
+  // Variables para entrar en las condiciones
   J1.Giro.enGiro = 0;
   J1.Movimiento.enMovimiento = 0;
 
+  // Definir pos inicial de carrito 
   J1.Movimiento.posX = 50;
   J1.Movimiento.posY = 180;
   
@@ -147,7 +185,7 @@ void setup() {
   pinMode(J1.Control.Acelerador, INPUT_PULLUP);
   pinMode(J1.Control.Drift, INPUT_PULLUP);    
 
-  LCD_Bitmap(0, 0, 320, 240, Pista1);
+  LCD_Bitmap(0, 0, 320, 240, Mapa_Pista1);
   LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
 }
 //***************************************************************************************************************************************
@@ -156,7 +194,26 @@ void setup() {
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
   J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha) | !digitalRead(J1.Control.Acelerador);
+  
+  /*
+  Serial.print("PosX: ");
+  Serial.print(J1.Movimiento.posX);
+  Serial.print(" PosY: ");
+  Serial.println(J1.Movimiento.posY);
+*/
 
+  // Borde exterior:
+  // x final   255
+  // x inicial  45
+  // y inicial 203
+  // y final    40
+
+  // Borde interior:
+  // x inicial 72
+  // x final   231
+  // y inicial 169
+  // y final   73
+  
   /*
   Serial.print("Pos angular: ");
   Serial.print(J1.Giro.Posicion_Angular_Actual);
@@ -174,23 +231,43 @@ void loop() {
   */
   
   if(J1.accion){
+
+    // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
     if(!digitalRead(J1.Control.Acelerador) && !J1.Movimiento.enMovimiento){
       J1.Movimiento.tAceleracion = millis();
       J1.Movimiento.enMovimiento = 1;   
     }
-    
+    // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
     else if(!digitalRead(J1.Control.Acelerador) && J1.Movimiento.enMovimiento){
       if(!digitalRead(J1.Control.Acelerador)&&(millis()-J1.Movimiento.tAceleracion)>=20){
         float posX_ini = J1.Movimiento.posX;
         float posY_ini = J1.Movimiento.posY;
+
+        // El sprite se encuentra dentro del borde exterior en coordenadas x
+        if( posX_ini > Pista1.Limites.xo && posX_ini < Pista1.Limites.xf){
+          // El sprite se encuentra dentro del borde exterior en coordenadas y
+          if(posY_ini > Pista1.Limites.yo && posY_ini < Pista1.Limites.yf){ 
+            
+          }
+          
+        }
         
-        movimientoCarro(posX_ini,posY_ini, 20, 0.009, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);  
-        
+        else if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){
+          Serial.print("uwu");
+            J1.Movimiento.Velocidad = -J1.Movimiento.Velocidad;
+                    
+        }else if(posY_ini > Pista1.Limites.yo || posY_ini < Pista1.Limites.yf){ 
+            J1.Movimiento.Velocidad = -J1.Movimiento.Velocidad;        
+            Serial.print("entra");
+          }
+
+        movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-        V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C);
+        V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 
       }    
     }
-    
+
+    // Al soltar el acelerador, se sale de las condiciones y no se mueve
     else if(digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
       J1.Movimiento.enMovimiento = 0;  
     }
