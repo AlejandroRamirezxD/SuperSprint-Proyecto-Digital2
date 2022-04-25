@@ -69,6 +69,8 @@ int Posicion_Angular_Actual = 0;
 int Angulo_V = 0;
 //int estado_aceleracion_J1 = 0;
 //int val_Push_Acelerar_J1  = 0;
+
+int accionBoton;
 /*
 +----------------------------------------------------------------------------------+
 |                                    VARIABLES                                     |                                   
@@ -160,6 +162,7 @@ void setup() {
 // Loop Infinito
 //***************************************************************************************************************************************
 void loop() {
+  accionBoton = !digitalRead(Primero.Control_Izquierda) || !digitalRead(Primero.Control_Derecha);
   // Leer estado boton Acelerar J1  
   //val_Push_Acelerar_J1 = digitalRead(Push_Acelerar_J1);
 
@@ -169,7 +172,7 @@ void loop() {
 
   //Medimos el tiempo que se ha invertido en el giro
   int Tiempo_Inicial_Giro = millis();
-  while(!digitalRead(Primero.Control_Izquierda) || !digitalRead(Primero.Control_Derecha)){
+  while(accionBoton){
     unsigned long Tiempo_Transcurrido_Giro = millis() - Tiempo_Inicial_Giro;
     if(digitalRead(Primero.Control_Derecha)== 0 && Tiempo_Transcurrido_Giro >=20){
       Angulo(Primero.Control_Izquierda, Primero.Control_Derecha,&Primero.Posicion_Angular_Actual,&Angulo_V);
@@ -183,9 +186,9 @@ void loop() {
       break;
     }
 
-    else if(Tiempo_Transcurrido_Giro >= 30){
+    /*else if(Tiempo_Transcurrido_Giro >= 30){
       break;
-    }
+    }*/
   }
   //Angulo(Push_Izquierdo, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
   //LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Posicion_Angular_Actual,0,0);
