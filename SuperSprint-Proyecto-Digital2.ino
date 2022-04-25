@@ -60,6 +60,9 @@ struct control{
   int Derecha;
   int Acelerador;
   int Freno;
+  int Drift;
+  int turnoDrift;
+  int rateGiro;
   };
 
 // Sub struct de las variables relacionadas al giro
@@ -125,10 +128,13 @@ void setup() {
   //LCD_Bitmap(0, 0, 320, 240, P_Inicio);
   //delay(5000);
 
-  J1.Control.Derecha = PF_4;
-  J1.Control.Izquierda = PA_4;
+  J1.Control.Derecha    = PA_4;
+  J1.Control.Izquierda  = PA_3;
   J1.Control.Acelerador = PF_0;
-
+  J1.Control.Drift      = PA_2;
+  J1.Control.rateGiro   = 60;
+  J1.Control.turnoDrift = 0;
+  
   J1.Giro.enGiro = 0;
   J1.Movimiento.enMovimiento = 0;
 
@@ -139,13 +145,10 @@ void setup() {
   pinMode(J1.Control.Izquierda, INPUT_PULLUP);
   pinMode(J1.Control.Derecha, INPUT_PULLUP);
   pinMode(J1.Control.Acelerador, INPUT_PULLUP);
-
-    
+  pinMode(J1.Control.Drift, INPUT_PULLUP);    
 
   LCD_Bitmap(0, 0, 320, 240, Pista1);
   LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
-
-  
 }
 //***************************************************************************************************************************************
 // Loop Infinito
@@ -153,6 +156,8 @@ void setup() {
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
   J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha) | !digitalRead(J1.Control.Acelerador);
+
+  /*
   Serial.print("Pos angular: ");
   Serial.print(J1.Giro.Posicion_Angular_Actual);
   Serial.print(" Angulo: ");
@@ -166,7 +171,7 @@ void loop() {
   
   Serial.print(" Coseno: ");
   Serial.println(cos(Angulote));
-
+  */
   
   if(J1.accion){
     if(!digitalRead(J1.Control.Acelerador) && !J1.Movimiento.enMovimiento){
@@ -179,7 +184,7 @@ void loop() {
         float posX_ini = J1.Movimiento.posX;
         float posY_ini = J1.Movimiento.posY;
         
-        movimientoCarro(posX_ini,posY_ini, 20, 0.03, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);  
+        movimientoCarro(posX_ini,posY_ini, 20, 0.009, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);  
         
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C);
@@ -198,26 +203,43 @@ void loop() {
       J1.Giro.enGiro = 1;
     }else if(J1.accion && J1.Giro.enGiro){
       /*    
-       *     El carro gira cada 20ms
+       *     El carro gira cada J1.Control.rateGiro ms
+       *     J1.Control.turnoDrift
        */
-      if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=60){
+      
+      if(!J1.Control.turnoDrift && !digitalRead(J1.Control.Drift)){
+        J1.Control.turnoDrift = 1;
+        J1.Control.rateGiro   = 20;
+                
+      }else if(J1.Control.turnoDrift && digitalRead(J1.Control.Drift)){
+        //J1.Control.turnoDrift = 0
+        J1.Control.rateGiro   = 60;
+        J1.Control.turnoDrift = 0;
+        
+      }
+             
+      if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
+        /*
         Serial.print("Posicion inicial: ");
         Serial.print(J1.Movimiento.posX);
         Serial.print(",");
         Serial.println(J1.Movimiento.posY);
         Serial.println("");
-      }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=60){
+        */
+      }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
+        /*
         Serial.print("Posicion inicial: ");
         Serial.print(J1.Movimiento.posX);
         Serial.print(",");
         Serial.println(J1.Movimiento.posY);
         Serial.println("");
+        */
       }
       
     }else if(!J1.accion && J1.Giro.enGiro){
