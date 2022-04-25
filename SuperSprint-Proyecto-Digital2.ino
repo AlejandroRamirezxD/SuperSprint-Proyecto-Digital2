@@ -179,7 +179,7 @@ void loop() {
         float posX_ini = J1.Movimiento.posX;
         float posY_ini = J1.Movimiento.posY;
         
-        movimientoCarro(posX_ini,posY_ini, 20, 0.01, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);  
+        movimientoCarro(posX_ini,posY_ini, 20, 0.03, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);  
         
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C);
