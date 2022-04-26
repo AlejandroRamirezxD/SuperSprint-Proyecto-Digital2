@@ -276,19 +276,19 @@ void loop() {
         // Sentido reloj, pared izquierda
         if(posX_ini <= Pista1.Limites.xo && (J1.Giro.Angulo >= 90 && J1.Giro.Angulo < 180)){
           
-          J1.Giro.Angulo = normAnguloIx(J1.Giro.Angulo);
+          //J1.Giro.Angulo = normAnguloIx(J1.Giro.Angulo);
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
         }
         // Sentido reloj, pared derecha
         else if(posX_ini >= Pista1.Limites.xf && J1.Giro.Angulo >= 180){
           
-          J1.Giro.Angulo = normAnguloIx(J1.Giro.Angulo);
+          //J1.Giro.Angulo = normAnguloIx(J1.Giro.Angulo);
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
         }
         // Sentido antireloj, pared derecha
         else if(posX_ini >= Pista1.Limites.xf && J1.Giro.Angulo <= 90){
           
-          J1.Giro.Angulo = normAnguloDx(J1.Giro.Angulo);
+          //J1.Giro.Angulo = normAnguloDx(J1.Giro.Angulo);
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
           //J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
           //Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
@@ -296,7 +296,7 @@ void loop() {
         }
         // Sentido antireloj, pared izquierda
         else if(posX_ini <= Pista1.Limites.xo && J1.Giro.Angulo >= 180){
-          J1.Giro.Angulo = normAnguloDx(J1.Giro.Angulo);
+          //J1.Giro.Angulo = normAnguloDx(J1.Giro.Angulo);
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
           //J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
           //Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
