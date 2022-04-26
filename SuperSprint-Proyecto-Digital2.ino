@@ -232,7 +232,18 @@ void loop() {
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
           J1.Movimiento.velY = -J1.Movimiento.velY;  
         }*/
-
+        //--------------------------Verificacion de limites de las paredes---------------------------
+        //*******************************Sentido Antihorario*****************************************
+        //Pared inferior
+        if(posY_ini>=Pista1.Limites.yf && J1.Giro.Angulo>=270){
+          J1.Giro.Angulo = normAngulo(J1.Giro.Angulo);
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+        }
+        //Pared derecha
+        else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo<=90){
+          J1.Giro.Angulo = normAngulo(J1.Giro.Angulo)+90;
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
+        }
         // Sentido reloj, pared izquierda
         if(posX_ini <= Pista1.Limites.xo && (J1.Giro.Angulo >= 90 && J1.Giro.Angulo < 180)){
           
