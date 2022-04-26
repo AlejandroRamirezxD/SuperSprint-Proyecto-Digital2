@@ -40,6 +40,43 @@ float normAngulo(float angulo){
   }  
 }
 
+float normAnguloI(float angulo){
+
+  if(angulo>90){
+    return (angulo-180+90);  
+  }
+  else if(angulo == 180){
+    return 0;  
+  }
+  else if(angulo > 270){
+    return (angulo-360+90);  
+  }
+  else if(angulo == 0){
+    return (180);  
+  }
+  else{
+    return angulo;  
+  }  
+}
+
+float normAnguloD(float angulo){
+
+  if(angulo<90){
+    return (angulo+90);  
+  }
+  else if(angulo == 0){
+    return 180;  
+  }
+  else if(angulo > 180){
+    return (angulo-180+270);  
+  }
+  else if(angulo == 180){
+    return (0);  
+  }
+  else{
+    return angulo;  
+  }  
+}
 
 
 int PosicionMap(int Posicion){
