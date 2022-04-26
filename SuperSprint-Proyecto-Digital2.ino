@@ -163,7 +163,7 @@ void setup() {
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
   J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha) | !digitalRead(J1.Control.Acelerador);
-  
+  Serial.println("Afuera");
   if(J1.accion){
 
     // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
@@ -287,10 +287,12 @@ void loop() {
         //J1.Movimiento.Velocidad = vel_ini + J1.Movimiento.Aceleracion * ;
         if((millis()-J1.Movimiento.tAceleracion)/100 <= limiteRate){
           rateVel = (millis()-J1.Movimiento.tAceleracion)/100;
+          Serial.println("15");
         }else{
           rateVel = limiteRate;
+          Serial.println("14");
         }
-
+        Serial.println(rateVel);
         
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini, rateVel , J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
@@ -300,7 +302,7 @@ void loop() {
     }
 
     // Al soltar el acelerador, se sale de las condiciones y no se mueve
-    else if(digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
+    if(digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
       J1.Movimiento.enMovimiento = 0;  
     }
     
