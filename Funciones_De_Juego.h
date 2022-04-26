@@ -40,7 +40,7 @@ float normAngulo(float angulo){
   }  
 }
 
-float normAnguloI(float angulo){
+float normAnguloIx(float angulo){
 
   if(angulo>90){
     return (angulo-180+90);  
@@ -59,7 +59,7 @@ float normAnguloI(float angulo){
   }  
 }
 
-float normAnguloD(float angulo){
+float normAnguloDx(float angulo){
 
   if(angulo<90){
     return (angulo+90);  
