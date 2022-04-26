@@ -6,6 +6,20 @@ void Angulo(int Push_Izquierdo,int Push_Derecho,int *Posicion_Angular_Actual,int
 void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velocidadY);
 void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float velocidad, float angulo, float *x_f, float *y_f);
 
+int Angulo_Cambia_Pos_Angular(int Angulo, int *Pos_Angular){
+    if(Angulo == 0){
+    *PosicionAngular = 0;  
+  }
+  else if(Angulo>=0 && Angulo <=270){
+    *PosicionAngular = (Angulo - 10)/10;
+  }
+  else if(Angulo>270 && Angulo <360){
+    *PosicionAngular = (Angulo - 270)/15 + 26;  
+  }
+}
+
+
+
 int PosicionMap(int Posicion){
   if(Posicion >= 0){
     return Posicion;
