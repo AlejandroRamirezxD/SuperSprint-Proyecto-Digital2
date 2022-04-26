@@ -8,14 +8,36 @@ void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float vel
 
 int Angulo_Cambia_Pos_Angular(int Angulo, int *Pos_Angular){
     if(Angulo == 0){
-    *PosicionAngular = 0;  
+    *Pos_Angular = 0;  
   }
   else if(Angulo>=0 && Angulo <=270){
-    *PosicionAngular = (Angulo - 10)/10;
+    *Pos_Angular = (Angulo - 10)/10;
   }
   else if(Angulo>270 && Angulo <360){
-    *PosicionAngular = (Angulo - 270)/15 + 26;  
+    *Pos_Angular = (Angulo - 270)/15 + 26;  
   }
+}
+
+float normAngulo(float angulo){
+  float anguloNormalizado;
+  if(angulo<=90){
+    return angulo;  
+  }
+  else if(angulo <=180){
+    anguloNormalizado = 180-angulo;
+    return anguloNormalizado;  
+  }
+  else if(angulo <=270){
+    anguloNormalizado = angulo-180;
+    return anguloNormalizado;  
+  }
+  else if(angulo <=360){
+    anguloNormalizado = 360-angulo;
+    return anguloNormalizado;  
+  }
+  else{
+    return angulo;  
+  }  
 }
 
 

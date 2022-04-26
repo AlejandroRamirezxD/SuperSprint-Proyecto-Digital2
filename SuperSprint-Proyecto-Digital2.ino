@@ -257,7 +257,6 @@ void loop() {
           if(posY_ini > Pista1.Limites.yo && posY_ini < Pista1.Limites.yf){ 
             
           }
-          
         }
         
         if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){
