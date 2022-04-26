@@ -132,6 +132,7 @@ void setup() {
   J1.Control.rateGiro   = 60;
   J1.Control.turnoDrift = 0;
   J1.Movimiento.Velocidad =  0.009;
+  J1.Movimiento.Aceleracion = 0.00001;
 
   // Variables para entrar en las condiciones
   J1.Giro.enGiro = 0;
@@ -172,9 +173,11 @@ void loop() {
     }
     // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
     else if(!digitalRead(J1.Control.Acelerador) && J1.Movimiento.enMovimiento){
+      
       if(!digitalRead(J1.Control.Acelerador)&&(millis()-J1.Movimiento.tAceleracion)>=20){
         float posX_ini = J1.Movimiento.posX;
         float posY_ini = J1.Movimiento.posY;
+        float  vel_ini = J1.Movimiento.Velocidad;
 
         // El sprite se encuentra dentro del borde exterior en coordenadas x
         if( posX_ini > Pista1.Limites.xo && posX_ini < Pista1.Limites.xf){
@@ -184,7 +187,7 @@ void loop() {
           }
         }
 
-        }
+        
         //--------------------------Verificacion de limites de las paredes---------------------------
         //*******************************Sentido Antihorario*****************************************
         //Pared inferior
@@ -279,9 +282,18 @@ void loop() {
 
         //--------------------------Verificacion de limites de borde interior---------------------------
         //***********************************Sentido AntiHorario*****************************************
+        float rateVel;
+        int limiteRate = 25;
+        //J1.Movimiento.Velocidad = vel_ini + J1.Movimiento.Aceleracion * ;
+        if((millis()-J1.Movimiento.tAceleracion)/100 <= limiteRate){
+          rateVel = (millis()-J1.Movimiento.tAceleracion)/100;
+        }else{
+          rateVel = limiteRate;
+        }
+
         
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
+        movimientoCarro(posX_ini,posY_ini, rateVel , J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 
       }    
@@ -345,6 +357,7 @@ void loop() {
       J1.Giro.enGiro = 0;  
     }
   }
+}
   
   
 // Medio aceleron, esta no tiene implementado el giro. Y no toma en cuenta la velocidad inicial al acelerar OJO
@@ -401,6 +414,7 @@ void loop() {
   }
 
 */
-}
+
+
   
   
