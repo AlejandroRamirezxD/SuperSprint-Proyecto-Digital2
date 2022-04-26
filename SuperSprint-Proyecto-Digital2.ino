@@ -238,83 +238,63 @@ void loop() {
         if(posY_ini>=Pista1.Limites.yf && J1.Giro.Angulo>=270){
           J1.Giro.Angulo = normAngulo(J1.Giro.Angulo);
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+          Serial.println("1");
         }
         //Pared derecha
-        else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo<=90){
+        else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo<=90&& J1.Giro.Angulo>=0 ){
+          Serial.println("2");  
+          Serial.print("AnguloO: ");
+          Serial.println(J1.Giro.Angulo);
           J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+90;
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);
+          
+          Serial.print("Angulof: ");
+          Serial.println(J1.Giro.Angulo);
         }
         //Pared superior
         else if(posY_ini<=Pista1.Limites.yo && J1.Giro.Angulo<=180 && J1.Giro.Angulo>=90){
           J1.Giro.Angulo = normAngulo(J1.Giro.Angulo)+180;
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+          Serial.println("3"); 
         }
         //Pared izquierda
-        else if(posX_ini<=Pista1.Limites.xo && J1.Giro.Angulo>=180){
+        else if(posX_ini<=Pista1.Limites.xo && J1.Giro.Angulo>=180 && J1.Giro.Angulo<=270){
           J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+270;
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);   
+          Serial.println("4"); 
         }
         //--------------------------Verificacion de limites de las paredes---------------------------
         //***********************************Sentido Horario*****************************************
         //Pared inferior
-        if(posY_ini>=Pista1.Limites.yf && J1.Giro.Angulo<=270){
+        if(posY_ini>=Pista1.Limites.yf && J1.Giro.Angulo<=270 && J1.Giro.Angulo>=180){
           J1.Giro.Angulo = 180 - normAngulo(J1.Giro.Angulo);
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+          Serial.println("5"); 
         }
         //Pared derecha
-        else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo>=270){
-          J1.Giro.Angulo = 90 - (90-normAngulo(J1.Giro.Angulo));
+        else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo>=270 && J1.Giro.Angulo<=360){
+          Serial.println("6");
+          Serial.print("AnguloO: ");
+          Serial.println(J1.Giro.Angulo);
+          J1.Giro.Angulo = 270 - (90-normAngulo(J1.Giro.Angulo));
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
+          Serial.print("AnguloF: ");
+          Serial.println(J1.Giro.Angulo);
+           
         }
         //Pared superior
         else if(posY_ini<=Pista1.Limites.yo && J1.Giro.Angulo<=180 && J1.Giro.Angulo<=90){
           J1.Giro.Angulo = 360 - normAngulo(J1.Giro.Angulo);
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+          Serial.println("7"); 
         }
         //Pared izquierda
         else if(posX_ini<=Pista1.Limites.xo && J1.Giro.Angulo>=90 && J1.Giro.Angulo<=180){
           J1.Giro.Angulo = 90 - (90-normAngulo(J1.Giro.Angulo));
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);   
+          Serial.println("8"); 
         }
-        // Sentido reloj, pared izquierda
-        if(posX_ini <= Pista1.Limites.xo && (J1.Giro.Angulo >= 90 && J1.Giro.Angulo < 180)){
-          
-          //J1.Giro.Angulo = normAnguloIx(J1.Giro.Angulo);
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
-        }
-        // Sentido reloj, pared derecha
-        else if(posX_ini >= Pista1.Limites.xf && J1.Giro.Angulo >= 180){
-          
-          //J1.Giro.Angulo = normAnguloIx(J1.Giro.Angulo);
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
-        }
-        // Sentido antireloj, pared derecha
-        else if(posX_ini >= Pista1.Limites.xf && J1.Giro.Angulo <= 90){
-          
-          //J1.Giro.Angulo = normAnguloDx(J1.Giro.Angulo);
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
-          //J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
-          //Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
-          //J1.Movimiento.velY = -J1.Movimiento.velY;  
-        }
-        // Sentido antireloj, pared izquierda
-        else if(posX_ini <= Pista1.Limites.xo && J1.Giro.Angulo >= 180){
-          //J1.Giro.Angulo = normAnguloDx(J1.Giro.Angulo);
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
-          //J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
-          //Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
-          //J1.Movimiento.velY = -J1.Movimiento.velY;  
-        }
- 
-        /*
-        if(posY_ini < Pista1.Limites.yo || posY_ini > Pista1.Limites.yf){ 
-          
-          J1.Movimiento.velY = -J1.Movimiento.velY;  
-             
-          Serial.print("entra");
-        }*/
-
-                 
+                         
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
@@ -380,27 +360,7 @@ void loop() {
       J1.Giro.enGiro = 0;  
     }
   }
-  /*while(accionBoton){
-    unsigned long Tiempo_Transcurrido_Giro = millis() - Tiempo_Inicial_Giro;
-    if(digitalRead(Primero.Control_Derecha)== 0 && Tiempo_Transcurrido_Giro >=20){
-      Angulo(Primero.Control_Izquierda, Primero.Control_Derecha,&Primero.Posicion_Angular_Actual,&Angulo_V);
-      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Primero.Posicion_Angular_Actual,0,0);
-      break;
-    }
   
-    else if(digitalRead(Primero.Control_Izquierda)== 0 && Tiempo_Transcurrido_Giro >=20){
-      Angulo(Primero.Control_Izquierda, Primero.Control_Derecha,&Primero.Posicion_Angular_Actual,&Angulo_V);
-      LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Primero.Posicion_Angular_Actual,0,0);
-      break;
-    }
-
-    /*else if(Tiempo_Transcurrido_Giro >= 30){
-      break;
-    }
-  }*/
-  //Angulo(Push_Izquierdo, Push_Derecho,&Posicion_Angular_Actual,&Angulo_V);
-  //LCD_Sprite(50,180,16,16,CarritoConPrivilegios,32,Posicion_Angular_Actual,0,0);
-
   
 // Medio aceleron, esta no tiene implementado el giro. Y no toma en cuenta la velocidad inicial al acelerar OJO
 /*
