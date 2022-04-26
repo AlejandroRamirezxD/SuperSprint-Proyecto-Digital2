@@ -117,10 +117,10 @@ void setup() {
   Pista1.Limites.yf = 201;
 
   // Borde interior
-  Pista1.Limites.xio = 72;
-  Pista1.Limites.xif = 231;
-  Pista1.Limites.yio = 169;
-  Pista1.Limites.yif = 73;
+  Pista1.Limites.xio = 71;
+  Pista1.Limites.xif = 232;
+  Pista1.Limites.yif = 169;
+  Pista1.Limites.yio = 73;
   
   // Pines asociados a botones
   J1.Control.Derecha    = PA_4;
@@ -273,14 +273,9 @@ void loop() {
         }
         //Pared derecha
         else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo>=270 && J1.Giro.Angulo<=360){
-          Serial.println("6");
-          Serial.print("AnguloO: ");
-          Serial.println(J1.Giro.Angulo);
+          Serial.println("6"); 
           J1.Giro.Angulo = 270 - (90-normAngulo(J1.Giro.Angulo));
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
-          Serial.print("AnguloF: ");
-          Serial.println(J1.Giro.Angulo);
-           
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);             
         }
         //Pared superior
         else if(posY_ini<=Pista1.Limites.yo && J1.Giro.Angulo<=180 && J1.Giro.Angulo<=90){
@@ -294,7 +289,38 @@ void loop() {
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);   
           Serial.println("8"); 
         }
-                         
+        //--------------------------Verificacion de limites de borde interior---------------------------
+        //***********************************Sentido Horario*****************************************
+         //Pared Superior
+        if(posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif && J1.Giro.Angulo>=270 && J1.Giro.Angulo<=360 && posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif ){
+          J1.Giro.Angulo = normAngulo(J1.Giro.Angulo);
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+          Serial.println("9"); 
+        }
+        //Pared derecha
+        else if(posX_ini<=Pista1.Limites.xif && posX_ini>=Pista1.Limites.xio && J1.Giro.Angulo>=180 && J1.Giro.Angulo<=270 && posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif ){
+          Serial.println("10"); 
+          J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+270;
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);             
+        }
+        //Pared inferior
+        else if(posY_ini<=Pista1.Limites.yif && posY_ini>=Pista1.Limites.yio && J1.Giro.Angulo>=90&& J1.Giro.Angulo<=180 && posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif ){
+          J1.Giro.Angulo = normAngulo(J1.Giro.Angulo)+180;
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+          Serial.println("12"); 
+        }
+        //Pared izquierda
+        else if(posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif && J1.Giro.Angulo>=0 && J1.Giro.Angulo<=90 && posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif){
+          J1.Giro.Angulo = 90-normAngulo(J1.Giro.Angulo)+90;
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);   
+          Serial.println("13"); 
+        }
+
+        //--------------------------Verificacion de limites de borde interior---------------------------
+        //***********************************Sentido AntiHorario*****************************************
+        
+           
+          
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
