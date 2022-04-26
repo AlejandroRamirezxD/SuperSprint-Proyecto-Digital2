@@ -259,9 +259,12 @@ void loop() {
         }
         //Pared izquierda
         else if(posX_ini<=Pista1.Limites.xo && J1.Giro.Angulo>=180 && J1.Giro.Angulo<=270){
-          J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+270;
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);   
           Serial.println("4"); 
+          J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+270;
+          if(J1.Giro.Angulo == 360){
+            J1.Giro.Angulo = 0;
+          }
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);   
         }
         //--------------------------Verificacion de limites de las paredes---------------------------
         //***********************************Sentido Horario*****************************************
@@ -301,7 +304,12 @@ void loop() {
         else if(posX_ini<=Pista1.Limites.xif && posX_ini>=Pista1.Limites.xio && J1.Giro.Angulo>=180 && J1.Giro.Angulo<=270 && posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif ){
           Serial.println("10"); 
           J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+270;
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);             
+          Serial.println(J1.Giro.Angulo);
+          if(J1.Giro.Angulo == 360){
+            J1.Giro.Angulo = 0;
+          }
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+          Serial.println(J1.Giro.Angulo);            
         }
         //Pared inferior
         else if(posY_ini<=Pista1.Limites.yif && posY_ini>=Pista1.Limites.yio && J1.Giro.Angulo>=90&& J1.Giro.Angulo<=180 && posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif ){
