@@ -261,14 +261,14 @@ void loop() {
         }
         
         if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){
-          Serial.print("uwu");
-          J1.Movimiento.velX = -J1.Movimiento.velX;
-                    
+          //Serial.print("uwu");
+          J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));          
         }
         if(posY_ini < Pista1.Limites.yo || posY_ini > Pista1.Limites.yf){ 
           J1.Movimiento.velY = -J1.Movimiento.velY;        
-          Serial.print("entra");
-          }
+          //Serial.print("entra");
+        }
+        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 

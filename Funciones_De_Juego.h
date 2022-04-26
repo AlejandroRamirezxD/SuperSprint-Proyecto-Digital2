@@ -5,6 +5,7 @@ int PosicionMap(int Posicion);
 void Angulo(int Push_Izquierdo,int Push_Derecho,int *PosicionAngular,int *Angulo);
 void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velocidadY);
 void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float velocidad, float angulo, float *x_f, float *y_f);
+float normAngulo(float angulo);
 
 int PosicionMap(int Posicion){
   if(Posicion >= 0){
@@ -58,6 +59,28 @@ void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velo
 void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float velocidadX, float velocidadY, float *x_f, float *y_f){
   *x_f = x_ini + t_refresco*velocidadX;
   *y_f = y_ini - t_refresco*velocidadY;
+}
+
+float normAngulo(float angulo){
+  float anguloNormalizado;
+  if(angulo<=90){
+    return angulo;  
+  }
+  else if(angulo <=180){
+    anguloNormalizado = 180-angulo;
+    return anguloNormalizado;  
+  }
+  else if(angulo <=270){
+    anguloNormalizado = angulo-180;
+    return anguloNormalizado;  
+  }
+  else if(angulo <=360){
+    anguloNormalizado = 360-angulo;
+    return anguloNormalizado;  
+  }
+  else{
+    return angulo;  
+  }  
 }
 
 #endif
