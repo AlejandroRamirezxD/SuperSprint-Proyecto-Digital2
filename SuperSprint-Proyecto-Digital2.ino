@@ -241,7 +241,7 @@ void loop() {
         }
         //Pared derecha
         else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo<=90){
-          J1.Giro.Angulo = normAngulo(J1.Giro.Angulo)+90;
+          J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+90;
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);  
         }
         // Sentido reloj, pared izquierda
