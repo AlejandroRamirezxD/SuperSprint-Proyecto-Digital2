@@ -6,7 +6,7 @@ void Angulo(int Push_Izquierdo,int Push_Derecho,int *Posicion_Angular_Actual,int
 void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velocidadY);
 void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float velocidad, float angulo, float *x_f, float *y_f);
 
-int Angulo_Cambia_Pos_Angular(int Angulo, int *Pos_Angular){
+void Angulo_Cambia_Pos_Angular(float Angulo, int *Pos_Angular){
     if(Angulo == 0){
     *Pos_Angular = 0;  
   }

@@ -261,8 +261,8 @@ void loop() {
         
         if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){
           Serial.print("uwu");
-          J1.Movimiento.velX = -J1.Movimiento.velX;
-                    
+          J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
+          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);          
         }
         if(posY_ini < Pista1.Limites.yo || posY_ini > Pista1.Limites.yf){ 
           J1.Movimiento.velY = -J1.Movimiento.velY;        
