@@ -296,11 +296,7 @@ void loop() {
         }
         // Sentido antireloj, pared izquierda
         else if(posX_ini <= Pista1.Limites.xo && J1.Giro.Angulo >= 180){
-          Serial.print(" Angulito: ");
-          Serial.println(J1.Giro.Angulo);
           J1.Giro.Angulo = normAnguloDx(J1.Giro.Angulo);
-          Serial.print(" Angulito000: ");
-          Serial.println(J1.Giro.Angulo);
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
           //J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
           //Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 

@@ -59,6 +59,40 @@ float normAnguloIx(float angulo){
   }  
 }
 
+float normAnguloIy(float angulo){
+
+  if(angulo<90){
+    return (angulo);  
+  }
+  else if(angulo == 90){
+    return 0;  
+  }
+  else if(angulo > 270){
+    return (angulo-360+90);  
+  }
+  else if(angulo == 0){
+    return (180);  
+  }
+  else{
+    return angulo;  
+  }  
+}
+
+float nomrAnguloDy(float angulo){
+  if(angulo>90){
+    return 180*2 + angulo;
+  }
+  else if(angulo >270){
+    return 180-(90-(360-angulo))-90;
+  }
+  else if(angulo == 90){
+    return 270;
+  }
+  else if(angulo == 270){
+    return 90;
+  }
+}
+
 float normAnguloDx(float angulo){
 
   if(angulo<90){
