@@ -163,41 +163,6 @@ void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
   J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha) | !digitalRead(J1.Control.Acelerador);
   
-  /*
-  Serial.print("PosX: ");
-  Serial.print(J1.Movimiento.posX);
-  Serial.print(" PosY: ");
-  Serial.println(J1.Movimiento.posY);
-*/
-
-  // Borde exterior:
-  // x final   255
-  // x inicial  45
-  // y inicial 203
-  // y final    40
-
-  // Borde interior:
-  // x inicial 72
-  // x final   231
-  // y inicial 169
-  // y final   73
-  
-  /*
-  Serial.print("Pos angular: ");
-  Serial.print(J1.Giro.Posicion_Angular_Actual);
-  Serial.print(" Angulo: ");
-  Serial.print(J1.Giro.Angulo);
-
-  float AngulitoLIndo = J1.Giro.Angulo*PI/180;
-  float Angulote = AngulitoLIndo;
-
-  Serial.print(" Angulote: ");
-  Serial.print(Angulote);
-  
-  Serial.print(" Coseno: ");
-  Serial.println(cos(Angulote));
-  */
-  
   if(J1.accion){
 
     // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
@@ -219,19 +184,7 @@ void loop() {
           }
         }
 
-        /*
-        if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){          
-          J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);          
-        }*/
-
-        /*
-        // Pasa de pared derecha
-        if(posX_ini >= Pista1.Limites.xf){
-          J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
-          J1.Movimiento.velY = -J1.Movimiento.velY;  
-        }*/
+        }
         //--------------------------Verificacion de limites de las paredes---------------------------
         //*******************************Sentido Antihorario*****************************************
         //Pared inferior
@@ -327,8 +280,6 @@ void loop() {
         //--------------------------Verificacion de limites de borde interior---------------------------
         //***********************************Sentido AntiHorario*****************************************
         
-           
-          
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini, 20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
@@ -452,65 +403,4 @@ void loop() {
 */
 }
   
-  /*
-  for (int x = 50; x < 270 - 16; x++) {
-    int anim2 = (x / 10) % 32;
-    LCD_Sprite(x,180,16,16,CarritoConPrivilegios,32,anim2,0,0);
-    V_line( x -1, 180, 16,  0x632C);
-    delay(15);
-  }
-  for (int x = 270-16; x > 50; x--) {
-    int anim2 = (x / 10) % 32;
-    LCD_Sprite(x,180,16,16,CarritoConPrivilegios,32,anim2,1,0);
-    V_line( x +16, 180, 16,   0x632C);
-    delay(15);
-  }
   
-  */
-  /* for(int x = 0; x <320-32; x++){
-     delay(15);
-     int anim2 = (x/35)%2;
-
-     LCD_Sprite(x,100,16,24,planta,2,anim2,0,1);
-     V_line( x -1, 100, 24, 0x421b);
-
-     //LCD_Bitmap(x, 100, 32, 32, prueba);
-
-     int anim = (x/11)%8;
-
-
-     int anim3 = (x/11)%4;
-
-     LCD_Sprite(x, 20, 16, 32, mario,8, anim,1, 0);
-     V_line( x -1, 20, 32, 0x421b);
-
-     //LCD_Sprite(x,100,32,32,bowser,4,anim3,0,1);
-     //V_line( x -1, 100, 32, 0x421b);
-
-
-     LCD_Sprite(x, 140, 16, 16, enemy,2, anim2,1, 0);
-     V_line( x -1, 140, 16, 0x421b);
-
-     LCD_Sprite(x, 175, 16, 32, luigi,8, anim,1, 0);
-     V_line( x -1, 175, 32, 0x421b);
-    }
-    for(int x = 320-32; x >0; x--){
-     delay(5);
-     int anim = (x/11)%8;
-     int anim2 = (x/11)%2;
-
-     LCD_Sprite(x,100,16,24,planta,2,anim2,0,0);
-     V_line( x + 16, 100, 24, 0x421b);
-
-     //LCD_Bitmap(x, 100, 32, 32, prueba);
-
-     //LCD_Sprite(x, 140, 16, 16, enemy,2, anim2,0, 0);
-     //V_line( x + 16, 140, 16, 0x421b);
-
-     //LCD_Sprite(x, 175, 16, 32, luigi,8, anim,0, 0);
-     //V_line( x + 16, 175, 32, 0x421b);
-
-     //LCD_Sprite(x, 20, 16, 32, mario,8, anim,0, 0);
-     //V_line( x + 16, 20, 32, 0x421b);
-    }
-  */
