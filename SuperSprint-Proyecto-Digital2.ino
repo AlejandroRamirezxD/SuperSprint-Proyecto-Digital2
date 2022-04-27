@@ -66,11 +66,13 @@ struct movimiento{
 
 // Hit box
 struct hitBox{
-  float DS;
-  float DI;
-  float IS;
-  float II;  
+  float x;
+  float y;
+  float xp;
+  float yp;  
 };
+
+
 
 // Super struct que contiene a los sub structs
 struct Jugador{
@@ -144,6 +146,8 @@ void setup() {
   J1.Control.Acelerador = PF_0;
   J1.Control.Drift      = PA_2;
   J1.Control.Freno      = PA_5;
+
+  // Hit box
 
   // Valores de maniobra
   J1.Control.rateGiro   = 60;
