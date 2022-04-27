@@ -64,13 +64,22 @@ struct movimiento{
   float posY;
   };
 
+// Hit box
+struct hitBox{
+  float DS;
+  float DI;
+  float IS;
+  float II;  
+};
+
 // Super struct que contiene a los sub structs
 struct Jugador{
   control Control;
   giro Giro;
   movimiento Movimiento;
   int accion;
-}J1;
+  hitBox HitBox;
+}J1,J2;
 
 struct limites{
   float xo;
@@ -149,8 +158,10 @@ void setup() {
   J1.Movimiento.tRebote = 0;
   
   // Definir pos inicial de carrito 
-  J1.Movimiento.posX = 50;
-  J1.Movimiento.posY = 180;
+  J1.Movimiento.posX = 50+5;
+  J1.Movimiento.posY = 170+5;
+  J2.Movimiento.posX = 50+5;
+  J2.Movimiento.posY = 190+5;
 
   //Definimos el valor de angulo inicial del carro
   J1.Giro.Posicion_Angular_Actual = 0;
@@ -167,6 +178,7 @@ void setup() {
 
   LCD_Bitmap(0, 0, 320, 240, Mapa_Pista1);
   LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
+  LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,0,0,0); // Mostrar carrito
 }
 //***************************************************************************************************************************************
 // Loop Infinito
