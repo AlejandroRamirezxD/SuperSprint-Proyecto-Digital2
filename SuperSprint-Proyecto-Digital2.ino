@@ -131,14 +131,7 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x632C);
-  
-//    FillRect(50, 60, 20, 20, 0xF800);
-//    FillRect(70, 60, 20, 20, 0x07E0);
-//    FillRect(90, 60, 20, 20, 0x001F);
-  
-  //LCD_Bitmap(0, 0, 320, 240, P_Inicio);
-  //delay(5000);
-  
+    
   // Limites asociados a la pista1
   // Borde exterior
   Pista1.Limites.xo = 48;
@@ -159,17 +152,35 @@ void setup() {
   J1.Control.Drift      = PA_2;
   J1.Control.Freno      = PA_5;
 
+  // Pines asociados a botones
+  J2.Control.Derecha    = PF_4;
+  J2.Control.Izquierda  = PD_7;
+  J2.Control.Acelerador = PA_7;
+  J2.Control.Drift      = PC_5;
+  J2.Control.Freno      = PE_3;
+
   // Valores de maniobra
   J1.Control.rateGiro   = 60;
   J1.Control.turnoDrift = 0;
   J1.Movimiento.Velocidad =  0;
   J1.Movimiento.Aceleracion = 0.0000001;
 
+   // Valores de maniobra
+  J2.Control.rateGiro   = 60;
+  J2.Control.turnoDrift = 0;
+  J2.Movimiento.Velocidad =  0;
+  J2.Movimiento.Aceleracion = 0.0000001;
+
   // Variables para entrar en las condiciones
   J1.Giro.enGiro = 0;
   J1.Movimiento.enMovimiento = 0;
   J1.Movimiento.enFrenado = 0;
   J1.Movimiento.tRebote = 0;
+
+  J2.Giro.enGiro = 0;
+  J2.Movimiento.enMovimiento = 0;
+  J2.Movimiento.enFrenado = 0;
+  J2.Movimiento.tRebote = 0;
   
   // Definir pos inicial de carrito 
   J1.Movimiento.posX = 50+5;
@@ -207,6 +218,12 @@ void setup() {
   pinMode(J1.Control.Drift, INPUT_PULLUP);
   pinMode(J1.Control.Freno, INPUT_PULLUP);    
 
+  pinMode(J2.Control.Izquierda, INPUT_PULLUP);
+  pinMode(J2.Control.Derecha, INPUT_PULLUP);
+  pinMode(J2.Control.Acelerador, INPUT_PULLUP);
+  pinMode(J2.Control.Drift, INPUT_PULLUP);
+  pinMode(J2.Control.Freno, INPUT_PULLUP);  
+
   LCD_Bitmap(0, 0, 320, 240, Mapa_Pista1);
   FillRect(150, 42, 2, 47, 0xF800); // Meta
   LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
@@ -218,6 +235,7 @@ void setup() {
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
   J1.accion =!digitalRead(J1.Control.Acelerador) | !digitalRead(J1.Control.Freno);
+  J2.accion =!digitalRead(J2.Control.Acelerador) | !digitalRead(J2.Control.Freno);
   Actualizar_Posicion_HitBox();
   
    
@@ -234,8 +252,10 @@ void loop() {
  
   //choque  = 0;
   accionMovimiento(&J1);
+  accionMovimiento(&J2);
 
   Giro_Girito(&J1);
+  Giro_Girito(&J2);
 }
 
 void Actualizar_Posicion_HitBox(){
