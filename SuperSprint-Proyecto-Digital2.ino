@@ -213,6 +213,7 @@ void loop() {
         //Pared superior
         else if(posY_ini<=Pista1.Limites.yo && J1.Giro.Angulo<=180 && J1.Giro.Angulo>=90){
           J1.Giro.Angulo = normAngulo(J1.Giro.Angulo)+180;
+          J1.Movimiento.posY = Pista1.Limites.yo -1;
           Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
           choque = 1;
           //Serial.println("3"); 
@@ -361,25 +362,11 @@ void loop() {
         compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
-        /*
-        Serial.print("Posicion inicial: ");
-        Serial.print(J1.Movimiento.posX);
-        Serial.print(",");
-        Serial.println(J1.Movimiento.posY);
-        Serial.println("");
-        */
       }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
         compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
-        /*
-        Serial.print("Posicion inicial: ");
-        Serial.print(J1.Movimiento.posX);
-        Serial.print(",");
-        Serial.println(J1.Movimiento.posY);
-        Serial.println("");
-        */
       }
       
     }
@@ -387,63 +374,26 @@ void loop() {
       J1.Giro.enGiro = 0;  
     }
   }
-}
-  
-  
-// Medio aceleron, esta no tiene implementado el giro. Y no toma en cuenta la velocidad inicial al acelerar OJO
-/*
-  // Bucle cuando se preciona acelerador
-  while(!val_Push_Acelerar_J1){
-    
-     // La unica funcion de este while que contiene otro while, es contar con una variable
-     // que tenga el tiempo inicial (variable Tiempo_Inicial_J1) y luego compararla con la 
-     // variable de tiempo final (Tiempo_Final_J1). Con una resta de estos tiempos, se 
-     // obtiene el tiempo de duracion. Esta resta se actualiza constantemente dentro del 
-     // while de bajo es el que va actualizando el valor de la duracion del boton apachado.
-    
-    val_Push_Acelerar_J1 = digitalRead(Push_Acelerar_J1); // Leer estado boton acelerador
-    Tiempo_Inicial_J1 = millis(); //Pasar el valor del millis al tiempo inicial
-    //Duracion_Boton_J1 = 0;
-    // Actualiza la resta de tiempos constantemente
-    while(!val_Push_Acelerar_J1){
-      val_Push_Acelerar_J1 = digitalRead(Push_Acelerar_J1);
-      // Actualiza el tiempo presente para luego comparar con el tiempo inicial al pulsar
-      Tiempo_Final_J1 = millis(); 
-      Duracion_Boton_J1 = Tiempo_Final_J1 - Tiempo_Inicial_J1; // Determina el tiempo 
-      //Turno_Boton_J1    = HIGH;
-
-      // Posicion a partir de la duracion del pulso
-      PosI_J1 = PosI_J1 + 0.5*AclI_J1*(Duracion_Boton_J1)*(Duracion_Boton_J1);
-      // VelI_J1 = PosI_J1/Duracion_Boton_J1;
-      
-      // Mover Sprite
-      LCD_Sprite(PosI_J1,180,16,16,CarritoConPrivilegios,32,0,0,0);
-      V_line( PosI_J1 -1, 180, 16,  0x632C);
-
-      // Imprimir tiempo pulsado
-      Serial.print("Tiempo pulsado: ");
-      Serial.print(Duracion_Boton_J1);
-      Serial.print(" Pos: ");
-      Serial.print(PosI_J1);
-      Serial.print(" Vel: ");
-      Serial.println(VelI_J1);
-
-      // Al soltar boton salir de while
-      if(val_Push_Acelerar_J1){
-        VelI_J1 = PosI_J1/Duracion_Boton_J1;
-        Serial.print(" Vel: ");
-        Serial.println(VelI_J1);
-        //Duracion_Boton_J1 = 0;
-        break;
-      }
+  else{
+    if(!J1.Movimiento.enMovimiento){
+      J1.Movimiento.tAceleracion = millis();
+      J1.Movimiento.enMovimiento = 1;  
     }
-    // Al soltar boton salir del while
-    if(val_Push_Acelerar_J1){
-        break;
+    else if(J1.Movimiento.enMovimiento && (millis()-J1.Movimiento.tAceleracion)>=20){
+      J1.Movimiento.Velocidad = J1.Movimiento.Velocidad - J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion);
+        if(J1.Movimiento.Velocidad <= 0){
+            J1.Movimiento.Velocidad = 0;
+        }
+      float posX_ini = J1.Movimiento.posX;
+      compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
+      movimientoCarro(J1.Movimiento.posX,J1.Movimiento.posY,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
+      LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+      V_line(J1.Movimiento.posX - posX_ini, 180, 16,  0x632C);
+      J1.Movimiento.enMovimiento = 0;  
     }
   }
+}
 
-*/
 
 
   
