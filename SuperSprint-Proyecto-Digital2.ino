@@ -97,6 +97,8 @@ void Condiciones_Colisones();
 void Giro_Girito();
 
 extern uint8_t Mapa_Pista1[];
+extern uint8_t CarritoConPrivilegios[];
+extern uint8_t CarritoSinPrivilegios[];
 //extern uint8_t P_Inicio [];
 //***************************************************************************************************************************************
 // Inicialización
