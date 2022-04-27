@@ -262,9 +262,9 @@ void loop() {
       float  vel_ini = J1.Movimiento.Velocidad;
       
       
-      J1.Movimiento.Velocidad = vel_ini - J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion)*10;
+      J1.Movimiento.Velocidad = vel_ini - J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion)*50;
       
-        if(J1.Movimiento.Velocidad <= 0.01){
+        if(J1.Movimiento.Velocidad <= 0){
            J1.Movimiento.Velocidad = 0;
         }
 
