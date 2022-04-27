@@ -233,131 +233,7 @@ void loop() {
   
  
   //choque  = 0;
-  if(J1.accion){
-    Serial.println("Entro");
-    //**************************************************************************************************
-    //**************************************************************************************************
-    //**************************************BOTON DE ACELERADOR*****************************************
-    //**************************************************************************************************
-    //**************************************************************************************************
-    // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
-    if(!digitalRead(J1.Control.Acelerador) && !J1.Movimiento.enMovimiento){
-      J1.Movimiento.tAceleracion = millis();
-      J1.Movimiento.enMovimiento = 1;   
-    }
-    // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
-    else if(!digitalRead(J1.Control.Acelerador) && J1.Movimiento.enMovimiento){
-      
-      if(!digitalRead(J1.Control.Acelerador)&&(millis()-J1.Movimiento.tAceleracion)>=20){
-        Condiciones_Colisones(&J1);
-         float posX_ini = J1.Movimiento.posX;
-         float posY_ini = J1.Movimiento.posY;
-         float  vel_ini = J1.Movimiento.Velocidad;
-
-        /* ---------------------------------------------------------------------------------------------
-         * **********************************Código de Aceleración**************************************
-         * ---------------------------------------------------------------------------------------------
-         */
-  
-        J1.Movimiento.Velocidad = J1.Movimiento.Velocidad + J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion);
-
-        if(J1.Movimiento.Velocidad >= 0.015){
-            J1.Movimiento.Velocidad = 0.015;
-        }
-
-        
-        FillRect(150, 42, 2, 47, 0xF800); // Meta
-        compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
-        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-        V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 
-      }    
-    }
-
-    // Al soltar el acelerador, se sale de las condiciones y no se mueve
-    if(digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
-      J1.Movimiento.enMovimiento = 0;  
-    }
-
-    //**************************************************************************************************
-    //**************************************************************************************************
-    //****************************************BOTON DE FRENO********************************************
-    //**************************************************************************************************
-    //**************************************************************************************************
-    // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
-    Serial.println(J1.Movimiento.enFrenado);
-    if(!digitalRead(J1.Control.Freno) && !J1.Movimiento.enFrenado){
-      Serial.println("Frenando");
-      J1.Movimiento.tFrenado = millis();
-      J1.Movimiento.enFrenado = 1;   
-    }
-    // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
-    else if(!digitalRead(J1.Control.Freno) && J1.Movimiento.enFrenado){
-      
-      if(!digitalRead(J1.Control.Freno)&&(millis()-J1.Movimiento.tFrenado)>=20){
-         Condiciones_Colisones(&J1);
-         float posX_ini = J1.Movimiento.posX;
-         float posY_ini = J1.Movimiento.posY;
-         float  vel_ini = J1.Movimiento.Velocidad;
-
-        /* ---------------------------------------------------------------------------------------------
-         * **********************************Código de Frenado******************************************
-         * ---------------------------------------------------------------------------------------------
-         */
-  
-        J1.Movimiento.Velocidad = J1.Movimiento.Velocidad - 2*J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tFrenado);
-
-        if(J1.Movimiento.Velocidad <= 0){
-            J1.Movimiento.Velocidad = 0;
-        }
-
-        
-        FillRect(150, 42, 2, 47, 0xF800); // Meta
-        compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
-        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-        V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 
-      }    
-    }
-
-    // Al soltar el acelerador, se sale de las condiciones y no se mueve
-    if(digitalRead(J1.Control.Freno)&&J1.Movimiento.enFrenado){
-      J1.Movimiento.enFrenado = 0;  
-    }
-    
-  }
-  else{
-    if(!J1.Movimiento.enMovimiento){
-      J1.Movimiento.tAceleracion = millis();
-      J1.Movimiento.enMovimiento = 1;  
-    }
-    else if(J1.Movimiento.enMovimiento == 1 && (millis()-J1.Movimiento.tAceleracion)>=2){
-
-      Condiciones_Colisones(&J1);
-      
-      float posX_ini = J1.Movimiento.posX;
-      float posY_ini = J1.Movimiento.posY;
-      float  vel_ini = J1.Movimiento.Velocidad;
-      
-      
-      J1.Movimiento.Velocidad = vel_ini - J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion)*50;
-      
-        if(J1.Movimiento.Velocidad <= 0){
-           J1.Movimiento.Velocidad = 0;
-        }
-      
-      FillRect(150, 42, 2, 47, 0xF800); // Meta
-      compVelocidad(J1.Movimiento.Velocidad*1000,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-      movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX/1000, J1.Movimiento.velY/1000, &J1.Movimiento.posX,&J1.Movimiento.posY);   
-      LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-      
-      
-      
-      
-      J1.Movimiento.enMovimiento = 0;   
-      J1.Movimiento.tAceleracion = millis();
-    }
-  }
+  accionMovimiento(&J1);
 
   Giro_Girito(&J1);
 }
@@ -442,7 +318,7 @@ void Condiciones_Colisones(struct Jugador *carro){
   //*******************************Sentido Antihorario*****************************************
   //Pared inferior
   if(posY_ini>=Pista1.Limites.yf && carro->Giro.Angulo>=270){
-    J1.Giro.Angulo = normAngulo(carro->Giro.Angulo);
+    carro->Giro.Angulo = normAngulo(carro->Giro.Angulo);
     Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual); 
     choque = 1;
     //Serial.println("1");
@@ -588,4 +464,132 @@ void Giro_Girito(struct Jugador *carro){
     if(!carro->accion && carro->Giro.enGiro){
       carro->Giro.enGiro = 0;  
     } 
+}
+
+void accionMovimiento(struct Jugador *carro){
+  if(carro->accion){
+    Serial.println("Entro");
+    //**************************************************************************************************
+    //**************************************************************************************************
+    //**************************************BOTON DE ACELERADOR*****************************************
+    //**************************************************************************************************
+    //**************************************************************************************************
+    // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
+    if(!digitalRead(carro->Control.Acelerador) && !carro->Movimiento.enMovimiento){
+      carro->Movimiento.tAceleracion = millis();
+      carro->Movimiento.enMovimiento = 1;   
+    }
+    // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
+    else if(!digitalRead(carro->Control.Acelerador) && carro->Movimiento.enMovimiento){
+      
+      if(!digitalRead(carro->Control.Acelerador)&&(millis()-carro->Movimiento.tAceleracion)>=20){
+        Condiciones_Colisones(&J1);
+         float posX_ini = carro->Movimiento.posX;
+         float posY_ini = carro->Movimiento.posY;
+         float  vel_ini = carro->Movimiento.Velocidad;
+
+        /* ---------------------------------------------------------------------------------------------
+         * **********************************Código de Aceleración**************************************
+         * ---------------------------------------------------------------------------------------------
+         */
+  
+        carro->Movimiento.Velocidad = carro->Movimiento.Velocidad + carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tAceleracion);
+
+        if(carro->Movimiento.Velocidad >= 0.015){
+            carro->Movimiento.Velocidad = 0.015;
+        }
+
+        
+        FillRect(150, 42, 2, 47, 0xF800); // Meta
+        compVelocidad(carro->Movimiento.Velocidad,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
+        movimientoCarro(posX_ini,posY_ini,20, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);          
+        LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
+        V_line( carro->Movimiento.posX - posX_ini, 180, 16,  0x632C); 
+      }    
+    }
+
+    // Al soltar el acelerador, se sale de las condiciones y no se mueve
+    if(digitalRead(carro->Control.Acelerador)&&carro->Movimiento.enMovimiento){
+      carro->Movimiento.enMovimiento = 0;  
+    }
+
+    //**************************************************************************************************
+    //**************************************************************************************************
+    //****************************************BOTON DE FRENO********************************************
+    //**************************************************************************************************
+    //**************************************************************************************************
+    // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
+    Serial.println(carro->Movimiento.enFrenado);
+    if(!digitalRead(carro->Control.Freno) && !carro->Movimiento.enFrenado){
+      Serial.println("Frenando");
+      carro->Movimiento.tFrenado = millis();
+      carro->Movimiento.enFrenado = 1;   
+    }
+    // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
+    else if(!digitalRead(carro->Control.Freno) && carro->Movimiento.enFrenado){
+      
+      if(!digitalRead(carro->Control.Freno)&&(millis()-carro->Movimiento.tFrenado)>=20){
+         Condiciones_Colisones(&J1);
+         float posX_ini = carro->Movimiento.posX;
+         float posY_ini = carro->Movimiento.posY;
+         float  vel_ini = carro->Movimiento.Velocidad;
+
+        /* ---------------------------------------------------------------------------------------------
+         * **********************************Código de Frenado******************************************
+         * ---------------------------------------------------------------------------------------------
+         */
+  
+        carro->Movimiento.Velocidad = carro->Movimiento.Velocidad - 2*carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tFrenado);
+
+        if(carro->Movimiento.Velocidad <= 0){
+            carro->Movimiento.Velocidad = 0;
+        }
+
+        
+        FillRect(150, 42, 2, 47, 0xF800); // Meta
+        compVelocidad(carro->Movimiento.Velocidad,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
+        movimientoCarro(posX_ini,posY_ini,20, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);          
+        LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
+        V_line( carro->Movimiento.posX - posX_ini, 180, 16,  0x632C); 
+      }    
+    }
+
+    // Al soltar el acelerador, se sale de las condiciones y no se mueve
+    if(digitalRead(carro->Control.Freno)&&carro->Movimiento.enFrenado){
+      carro->Movimiento.enFrenado = 0;  
+    }
+    
+  }
+  else{
+    if(!carro->Movimiento.enMovimiento){
+      carro->Movimiento.tAceleracion = millis();
+      carro->Movimiento.enMovimiento = 1;  
+    }
+    else if(carro->Movimiento.enMovimiento == 1 && (millis()-carro->Movimiento.tAceleracion)>=2){
+
+      Condiciones_Colisones(&J1);
+      
+      float posX_ini = carro->Movimiento.posX;
+      float posY_ini = carro->Movimiento.posY;
+      float  vel_ini = carro->Movimiento.Velocidad;
+      
+      
+      carro->Movimiento.Velocidad = vel_ini - carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tAceleracion)*50;
+      
+        if(carro->Movimiento.Velocidad <= 0){
+           carro->Movimiento.Velocidad = 0;
+        }
+      
+      FillRect(150, 42, 2, 47, 0xF800); // Meta
+      compVelocidad(carro->Movimiento.Velocidad*1000,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
+      movimientoCarro(posX_ini,posY_ini,20, carro->Movimiento.velX/1000, carro->Movimiento.velY/1000, &carro->Movimiento.posX,&carro->Movimiento.posY);   
+      LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
+      
+      
+      
+      
+      carro->Movimiento.enMovimiento = 0;   
+      carro->Movimiento.tAceleracion = millis();
+    }
+  }
 }
