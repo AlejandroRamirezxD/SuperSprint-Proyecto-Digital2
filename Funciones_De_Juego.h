@@ -79,8 +79,10 @@ void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual,
 }
 
 void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velocidadY){
-  *velocidadX =  velocidad*cos(angulo*PI/180);
-  *velocidadY =  velocidad*sin(angulo*PI/180);
+  float COS = cos(angulo*PI/180);
+  float SEN = sin(angulo*PI/180);
+  *velocidadX =  velocidad*COS;
+  *velocidadY =  velocidad*SEN;
 }
 
 void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float velocidadX, float velocidadY, float *x_f, float *y_f){
