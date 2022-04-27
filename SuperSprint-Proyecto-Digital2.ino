@@ -133,8 +133,8 @@ void setup() {
   // Valores de maniobra
   J1.Control.rateGiro   = 60;
   J1.Control.turnoDrift = 0;
-  J1.Movimiento.Velocidad =  0.009;
-  J1.Movimiento.Aceleracion = 0.00001;
+  J1.Movimiento.Velocidad =  0;
+  J1.Movimiento.Aceleracion = 0.0000001;
 
   // Variables para entrar en las condiciones
   J1.Giro.enGiro = 0;
@@ -298,47 +298,31 @@ void loop() {
           J1.Movimiento.tRebote = millis();
         }
 
-        //--------------------------Verificacion de limites de borde interior---------------------------
-        //***********************************Sentido AntiHorario*****************************************
+        /* ---------------------------------------------------------------------------------------------
+         * **********************************Código de Aceleración**************************************
+         * ---------------------------------------------------------------------------------------------
+         */
         unsigned long rateVel;
         unsigned long limiteRate = 30;
-        
-        //J1.Movimiento.Velocidad = vel_ini + J1.Movimiento.Aceleracion * ;
- /*
-        if(choque == 0){
-          if((millis()-J1.Movimiento.tAceleracion)/100 <= limiteRate){
-            rateVel = (millis()-J1.Movimiento.tAceleracion)/100;
-            //Serial.println("15");
-          }  
-          else{
-            rateVel = limiteRate;
-           //Serial.println("14");
-          }    
-        }else if(choque == 1){
-           //choque = 0;
-           if((millis()-J1.Movimiento.tRebote)/100 <= limiteRate){
-            //Serial.print("A");
-            rateVel = (millis()-J1.Movimiento.tRebote)/100;
-            //Serial.println("15");
-            }  
-            else{
-              rateVel = limiteRate;
-             //Serial.println("14");
-            }           
-        }*/
 
-       if((millis()-J1.Movimiento.tAceleracion)/100 <= limiteRate){
+        J1.Movimiento.Velocidad = J1.Movimiento.Velocidad + J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion);
+
+        if(J1.Movimiento.Velocidad >= 0.015){
+            J1.Movimiento.Velocidad = 0.015;
+        }
+
+        /*if((millis()-J1.Movimiento.tAceleracion)/100 <= limiteRate){
           rateVel = (millis()-J1.Movimiento.tAceleracion)/100;
           //Serial.println("15");
         }  
         else{
           rateVel = limiteRate;
          //Serial.println("14");
-        } 
+        }*/ 
        
         
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        movimientoCarro(posX_ini,posY_ini,rateVel, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
+        movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 
       }    
