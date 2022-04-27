@@ -86,6 +86,10 @@ struct Jugador{
   int accion;
 }J1,J2;
 
+struct Linea{
+  hitBox HitBox;
+}Meta;
+
 struct limites{
   float xo;
   float xf;
@@ -127,6 +131,10 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x632C);
+  
+//    FillRect(50, 60, 20, 20, 0xF800);
+//    FillRect(70, 60, 20, 20, 0x07E0);
+//    FillRect(90, 60, 20, 20, 0x001F);
   
   //LCD_Bitmap(0, 0, 320, 240, P_Inicio);
   //delay(5000);
@@ -200,6 +208,7 @@ void setup() {
   pinMode(J1.Control.Freno, INPUT_PULLUP);    
 
   LCD_Bitmap(0, 0, 320, 240, Mapa_Pista1);
+  FillRect(150, 42, 2, 47, 0xF800); // Meta
   LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
   LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,0,0,0); // Mostrar carrito
 }
@@ -210,6 +219,18 @@ void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
   J1.accion =!digitalRead(J1.Control.Acelerador) | !digitalRead(J1.Control.Freno);
   Actualizar_Posicion_HitBox();
+  
+   
+  Meta.HitBox.a.x = 150;
+  Meta.HitBox.a.y = 42;
+  Meta.HitBox.b.x = 150+2;
+  Meta.HitBox.b.y = 42;
+  Meta.HitBox.c.x = 150;
+  Meta.HitBox.c.y = 42+31;
+  Meta.HitBox.d.x = 150+2;;
+  Meta.HitBox.d.y = 42+31;
+
+  
  
   //choque  = 0;
   if(J1.accion){
@@ -245,7 +266,7 @@ void loop() {
         }
 
         
-        
+        FillRect(150, 42, 2, 47, 0xF800); // Meta
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
@@ -291,7 +312,7 @@ void loop() {
         }
 
         
-        
+        FillRect(150, 42, 2, 47, 0xF800); // Meta
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
@@ -325,7 +346,7 @@ void loop() {
            J1.Movimiento.Velocidad = 0;
         }
       
-      
+      FillRect(150, 42, 2, 47, 0xF800); // Meta
       compVelocidad(J1.Movimiento.Velocidad*1000,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
       movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX/1000, J1.Movimiento.velY/1000, &J1.Movimiento.posX,&J1.Movimiento.posY);   
       LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
@@ -550,11 +571,13 @@ void Giro_Girito(){
       }
              
       if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
+        FillRect(150, 42, 2, 47, 0xF800); // Meta
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
         compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
       }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
+        FillRect(150, 42, 2, 47, 0xF800); // Meta
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
         compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
