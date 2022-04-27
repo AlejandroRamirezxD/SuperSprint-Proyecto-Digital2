@@ -64,23 +64,26 @@ struct movimiento{
   float posY;
   };
 
-// Hit box
-struct hitBox{
+// 
+struct coordenada{
   float x;
   float y;
-  float xp;
-  float yp;  
 };
 
-
+struct hitBox{
+  coordenada a;
+  coordenada b;
+  coordenada c;
+  coordenada d;
+};
 
 // Super struct que contiene a los sub structs
 struct Jugador{
+  hitBox HitBox;
   control Control;
   giro Giro;
   movimiento Movimiento;
   int accion;
-  hitBox HitBox;
 }J1,J2;
 
 struct limites{
@@ -108,6 +111,7 @@ struct Pista{
 */
 void Condiciones_Colisones();
 void Giro_Girito();
+void Actualizar_Posicion_HitBox();
 
 extern uint8_t Mapa_Pista1[];
 extern uint8_t CarritoConPrivilegios[];
@@ -126,7 +130,7 @@ void setup() {
   
   //LCD_Bitmap(0, 0, 320, 240, P_Inicio);
   //delay(5000);
-
+  
   // Limites asociados a la pista1
   // Borde exterior
   Pista1.Limites.xo = 48;
@@ -147,8 +151,6 @@ void setup() {
   J1.Control.Drift      = PA_2;
   J1.Control.Freno      = PA_5;
 
-  // Hit box
-
   // Valores de maniobra
   J1.Control.rateGiro   = 60;
   J1.Control.turnoDrift = 0;
@@ -166,6 +168,23 @@ void setup() {
   J1.Movimiento.posY = 170+5;
   J2.Movimiento.posX = 50+5;
   J2.Movimiento.posY = 190+5;
+
+  // Hit box
+  // Esquina superior Izquierda
+  J1.HitBox.a.x = J1.Movimiento.posX;
+  J1.HitBox.a.y = J1.Movimiento.posY;
+
+  // Esquina superior Derecha
+  J1.HitBox.b.x = J1.Movimiento.posX + 32;
+  J1.HitBox.b.y = J1.Movimiento.posY;
+
+  // Esquina inferior Derecha
+  J1.HitBox.c.x = J1.Movimiento.posX;
+  J1.HitBox.c.y = J1.Movimiento.posY + 32;
+
+  // Esquina inferior Izquierda
+  J1.HitBox.d.x = J1.Movimiento.posX + 32;
+  J1.HitBox.d.y = J1.Movimiento.posY + 32;
 
   //Definimos el valor de angulo inicial del carro
   J1.Giro.Posicion_Angular_Actual = 0;
@@ -190,6 +209,8 @@ void setup() {
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
   J1.accion =!digitalRead(J1.Control.Acelerador) | !digitalRead(J1.Control.Freno);
+  Actualizar_Posicion_HitBox();
+ 
   //choque  = 0;
   if(J1.accion){
     Serial.println("Entro");
@@ -318,6 +339,68 @@ void loop() {
   }
 
   Giro_Girito();
+}
+
+void Actualizar_Posicion_HitBox(){
+    // Hit box J1-------------------------------------------------------------------
+  // Esquina superior Izquierda
+  J1.HitBox.a.x = J1.Movimiento.posX;
+  J1.HitBox.a.y = J1.Movimiento.posY;
+
+  // Esquina superior Derecha
+  J1.HitBox.b.x = J1.Movimiento.posX + 32;
+  J1.HitBox.b.y = J1.Movimiento.posY;
+
+  // Esquina inferior Derecha
+  J1.HitBox.c.x = J1.Movimiento.posX;
+  J1.HitBox.c.y = J1.Movimiento.posY + 32;
+
+  // Esquina inferior Izquierda
+  J1.HitBox.d.x = J1.Movimiento.posX + 32;
+  J1.HitBox.d.y = J1.Movimiento.posY + 32;
+
+  // Hit box J2-------------------------------------------------------------------
+  // Esquina superior Izquierda
+  J2.HitBox.a.x = J2.Movimiento.posX;
+  J2.HitBox.a.y = J2.Movimiento.posY;
+
+  // Esquina superior Derecha
+  J2.HitBox.b.x = J2.Movimiento.posX + 32;
+  J2.HitBox.b.y = J2.Movimiento.posY;
+
+  // Esquina inferior Derecha
+  J2.HitBox.c.x = J2.Movimiento.posX;
+  J2.HitBox.c.y = J2.Movimiento.posY + 32;
+
+  // Esquina inferior Izquierda
+  J2.HitBox.d.x = J2.Movimiento.posX + 32;
+  J2.HitBox.d.y = J2.Movimiento.posY + 32;
+  
+  /*
+  Serial.print("PosX: ");
+  Serial.print(J1.Movimiento.posX);
+  Serial.print("PosY: ");
+  Serial.print(J1.Movimiento.posY);
+  
+  Serial.print(" a: ");
+  Serial.print(J1.HitBox.a.x);
+  Serial.print(",");
+  Serial.print(J1.HitBox.a.y);
+
+  Serial.print(" b: ");
+  Serial.print(J1.HitBox.b.x);
+  Serial.print(",");
+  Serial.print(J1.HitBox.b.y);
+
+  Serial.print(" c: ");
+  Serial.print(J1.HitBox.c.x);
+  Serial.print(",");
+  Serial.print(J1.HitBox.c.y);
+
+  Serial.print(" d: ");
+  Serial.print(J1.HitBox.d.x);
+  Serial.print(",");
+  Serial.println(J1.HitBox.d.y);*/
 }
 
 void Condiciones_Colisones(){
