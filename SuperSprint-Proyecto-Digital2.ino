@@ -102,6 +102,7 @@ struct limites{
 };
 
 unsigned long tRefLCD;
+unsigned long  tRefLCD_2 ;
 
 int drawJ1, drawJ2, choque;
 
@@ -236,7 +237,7 @@ void setup() {
   LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,0,0,0); // Mostrar carrito
 }
 //***************************************************************************************************************************************
-// Loop Infinito
+// LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP
 //***************************************************************************************************************************************
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
@@ -263,24 +264,34 @@ void loop() {
   Giro_Girito(&J1);
   Giro_Girito(&J2);
 
-  if((millis() - tRefLCD)<25){
-    drawJ1 = 1;
-    drawJ2 = 1;
-  }else if((millis() - tRefLCD)>=25){
-    if(drawJ1){
-      LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-      drawJ1 = 0;  
-    }
-  }else if((millis() - tRefLCD)>=50){
-    if(drawJ2){
-      LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,J2.Giro.Posicion_Angular_Actual,0,0);
-      drawJ2 = 0;  
-    }  
-  }else{
-    tRefLCD = millis();  
-  }
-}
+  
 
+  // CarritoConPrivilegios
+  if(!drawJ1 && !tRefLCD_2){
+    drawJ1 = 1;
+    tRefLCD = millis();
+  }else if((millis() - tRefLCD )>25){
+    LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+  }else if((millis() - tRefLCD )>25 && drawJ1 == 1){
+    drawJ1 = 0;
+    tRefLCD_2 = (millis() - tRefLCD );
+  }
+  
+  if(!drawJ2 && tRefLCD_2 > 25){
+    drawJ2 = 1;
+    tRefLCD = millis();
+  }else if((millis() - tRefLCD )>50){
+    LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,J2.Giro.Posicion_Angular_Actual,0,0);
+  }else if((millis() - tRefLCD )>25 && drawJ2 == 1){
+    drawJ2 = 0;
+    tRefLCD_2 = 0;
+  }
+
+  
+}
+//***************************************************************************************************************************************
+// LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP
+//***************************************************************************************************************************************
 void Actualizar_Posicion_HitBox(){
     // Hit box J1-------------------------------------------------------------------
   // Esquina superior Izquierda
