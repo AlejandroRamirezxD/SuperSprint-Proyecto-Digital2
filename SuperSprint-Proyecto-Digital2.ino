@@ -253,7 +253,7 @@ void loop() {
       J1.Movimiento.tAceleracion = millis();
       J1.Movimiento.enMovimiento = 1;  
     }
-    else if(J1.Movimiento.enMovimiento == 1 && (millis()-J1.Movimiento.tAceleracion)>=20){
+    else if(J1.Movimiento.enMovimiento == 1 && (millis()-J1.Movimiento.tAceleracion)>=2){
 
       Condiciones_Colisones();
       
@@ -269,7 +269,9 @@ void loop() {
         //}
 
       compVelocidad(J1.Movimiento.Velocidad*1000,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-      movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX/1000, J1.Movimiento.velY/1000, &J1.Movimiento.posX,&J1.Movimiento.posY);            
+      movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX/1000, J1.Movimiento.velY/1000, &J1.Movimiento.posX,&J1.Movimiento.posY);   
+
+               
       LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
       J1.Movimiento.enMovimiento = 0;   
       J1.Movimiento.tAceleracion = millis();
