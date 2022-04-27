@@ -210,28 +210,7 @@ void loop() {
       if(!digitalRead(J1.Control.Acelerador)&&(millis()-J1.Movimiento.tAceleracion)>=20){
         float posX_ini = J1.Movimiento.posX;
         float posY_ini = J1.Movimiento.posY;
-
-        // El sprite se encuentra dentro del borde exterior en coordenadas x
-        if( posX_ini > Pista1.Limites.xo && posX_ini < Pista1.Limites.xf){
-          // El sprite se encuentra dentro del borde exterior en coordenadas y
-          if(posY_ini > Pista1.Limites.yo && posY_ini < Pista1.Limites.yf){ 
-            
-          }
-        }
-
-        /*
-        if (posX_ini <= Pista1.Limites.xo || posX_ini >= Pista1.Limites.xf){          
-          J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);          
-        }*/
-
-        /*
-        // Pasa de pared derecha
-        if(posX_ini >= Pista1.Limites.xf){
-          J1.Giro.Angulo = J1.Giro.Angulo + 2*(90-normAngulo(J1.Giro.Angulo));
-          Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
-          J1.Movimiento.velY = -J1.Movimiento.velY;  
-        }*/
+        
         //--------------------------Verificacion de limites de las paredes---------------------------
         //*******************************Sentido Antihorario*****************************************
         //Pared inferior
