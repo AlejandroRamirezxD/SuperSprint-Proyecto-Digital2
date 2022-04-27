@@ -55,11 +55,11 @@ struct movimiento{
   int enMovimiento;
   unsigned long tAceleracion;
   unsigned long tRebote;
+  unsigned long tMovimiento;
+  int tRefresco;
   float Velocidad;
-  float velX;
-  float velY;
-  float posX;
-  float posY;
+  int posX;
+  int posY;
   };
 
 // Super struct que contiene a los sub structs
@@ -71,14 +71,14 @@ struct Jugador{
 }J1;
 
 struct limites{
-  float xo;
-  float xf;
-  float yo;
-  float yf;
-  float xio;
-  float xif;
-  float yio;
-  float yif;
+  int xo;
+  int xf;
+  int yo;
+  int yf;
+  int xio;
+  int xif;
+  int yio;
+  int yif;
 };
 
 int   choque = 0;
@@ -149,7 +149,6 @@ void setup() {
   //Definimos el valor de angulo inicial del carro
   J1.Giro.Posicion_Angular_Actual = 0;
   J1.Giro.Angulo = 0;
-  compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
   
   
   //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
@@ -173,34 +172,42 @@ void loop() {
     // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
     if(!digitalRead(J1.Control.Acelerador) && !J1.Movimiento.enMovimiento){
       J1.Movimiento.tAceleracion = millis();
+      J1.Movimiento.tMovimiento = millis();
       J1.Movimiento.enMovimiento = 1;   
     }
     // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
     else if(!digitalRead(J1.Control.Acelerador) && J1.Movimiento.enMovimiento){
       
-      if(!digitalRead(J1.Control.Acelerador)&&(millis()-J1.Movimiento.tAceleracion)>=20){
-        Condiciones_Colisones();
-         float posX_ini = J1.Movimiento.posX;
-         float posY_ini = J1.Movimiento.posY;
-         float  vel_ini = J1.Movimiento.Velocidad;
-
+      if((millis()-J1.Movimiento.tAceleracion)>=20){
+         Condiciones_Colisones();
         /* ---------------------------------------------------------------------------------------------
          * **********************************Código de Aceleración**************************************
          * ---------------------------------------------------------------------------------------------
          */
-        unsigned long rateVel;
-        unsigned long limiteRate = 25;
-
+        Serial.println("Entro");
+        
         J1.Movimiento.Velocidad = J1.Movimiento.Velocidad + J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion);
 
         if(J1.Movimiento.Velocidad >= 0.015){
             J1.Movimiento.Velocidad = 0.015;
         }
-        
-        compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
+        J1.Movimiento.tRefresco = 1/(0.3*J1.Movimiento.Velocidad) + 1;
+
+        if(J1.Movimiento.tRefresco <= 20){
+          J1.Movimiento.tRefresco = 20;  
+        }      
+      }
+      if((millis()-J1.Movimiento.tMovimiento)>=J1.Movimiento.tRefresco){
+        float posX_ini = J1.Movimiento.posX;
+        float posY_ini = J1.Movimiento.posY;
+        float  vel_ini = J1.Movimiento.Velocidad;
+        Condiciones_Colisones();
+        movimientoCarro(J1.Movimiento.posX,J1.Movimiento.posY,J1.Movimiento.tRefresco, J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);          
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-        V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 
+        int x_f = J1.Movimiento.Velocidad*J1.Movimiento.tRefresco;
+        Serial.print(x_f);
+        Serial.println("Putaaaaaaaaaa");
+        V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C);
       }    
     }
 
@@ -230,10 +237,8 @@ void loop() {
         if(J1.Movimiento.Velocidad <= 0){
            J1.Movimiento.Velocidad = 0;
         }
-      
-      
-      compVelocidad(J1.Movimiento.Velocidad*1000,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-      movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX/1000, J1.Movimiento.velY/1000, &J1.Movimiento.posX,&J1.Movimiento.posY);   
+        
+      movimientoCarro(posX_ini,posY_ini,J1.Movimiento.tRefresco, J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.posX,&J1.Movimiento.posY);   
       LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
       
       
@@ -395,12 +400,10 @@ void Giro_Girito(){
              
       if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
-        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
       }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
         Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
-        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
         J1.Giro.tGiro = millis();
       }

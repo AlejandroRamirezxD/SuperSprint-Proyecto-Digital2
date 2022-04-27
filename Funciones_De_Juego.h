@@ -4,7 +4,7 @@
 int PosicionMap(int Posicion);
 void Angulo(int Push_Izquierdo,int Push_Derecho,int *Posicion_Angular_Actual,int *Angulo);
 void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velocidadY);
-void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float velocidad, float angulo, float *x_f, float *y_f);
+void movimientoCarro(int x_ini, int y_ini,int t_refresco,float velocidad, float angulo, int *x_f, int *y_f);
 
 void Angulo_Cambia_Pos_Angular(float Angulo, int *Pos_Angular){
     if(Angulo == 0){
@@ -78,16 +78,9 @@ void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual,
   }
 }
 
-void compVelocidad(float velocidad, float angulo, float *velocidadX, float *velocidadY){
-  float COS = cos(angulo*PI/180);
-  float SEN = sin(angulo*PI/180);
-  *velocidadX =  velocidad*COS;
-  *velocidadY =  velocidad*SEN;
-}
-
-void movimientoCarro(float x_ini, float y_ini,unsigned long t_refresco,float velocidadX, float velocidadY, float *x_f, float *y_f){
-  *x_f = x_ini + t_refresco*velocidadX;
-  *y_f = y_ini - t_refresco*velocidadY;
+void movimientoCarro(int x_ini, int y_ini,int t_refresco,float velocidad, float angulo, int *x_f, int *y_f){
+  *x_f = x_ini + t_refresco*velocidad*cos(angulo*PI/180);
+  *y_f = y_ini - t_refresco*velocidad*sin(angulo*PI/180);
 }
 
 #endif
