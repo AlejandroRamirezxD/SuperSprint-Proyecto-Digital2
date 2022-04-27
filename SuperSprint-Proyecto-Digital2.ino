@@ -262,11 +262,11 @@ void loop() {
       float  vel_ini = J1.Movimiento.Velocidad;
       
       
-      //J1.Movimiento.Velocidad = vel_ini - J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion);
+      J1.Movimiento.Velocidad = vel_ini*100 - J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion)*110;
       
-        //if(J1.Movimiento.Velocidad <= 0.01){
-          //  J1.Movimiento.Velocidad = 0;
-        //}
+        if(J1.Movimiento.Velocidad <= 0.01){
+           J1.Movimiento.Velocidad = 0;
+        }
 
       compVelocidad(J1.Movimiento.Velocidad*1000,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
       movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX/1000, J1.Movimiento.velY/1000, &J1.Movimiento.posX,&J1.Movimiento.posY);   
