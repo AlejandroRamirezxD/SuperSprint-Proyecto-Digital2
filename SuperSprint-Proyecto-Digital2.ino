@@ -101,7 +101,9 @@ struct limites{
   float yif;
 };
 
-int   choque = 0;
+unsigned long tRefLCD;
+
+int drawJ1, drawJ2, choque;
 
 // Struct dedicado a los limites de pista 1
 struct Pista{
@@ -209,7 +211,11 @@ void setup() {
   J1.Giro.Posicion_Angular_Actual = 0;
   J1.Giro.Angulo = 0;
   compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-  
+
+  //Variable de refresco
+  tRefLCD = millis();
+  drawJ1 = 0;
+  drawJ2 = 0;
   
   //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
   pinMode(J1.Control.Izquierda, INPUT_PULLUP);
@@ -256,6 +262,23 @@ void loop() {
 
   Giro_Girito(&J1);
   Giro_Girito(&J2);
+
+  if((millis() - tRefLCD)<25){
+    drawJ1 = 1;
+    drawJ2 = 1;
+  }else if((millis() - tRefLCD)>=25){
+    if(drawJ1){
+      LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+      drawJ1 = 0;  
+    }
+  }else if((millis() - tRefLCD)>=50){
+    if(drawJ2){
+      LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,J2.Giro.Posicion_Angular_Actual,0,0);
+      drawJ2 = 0;  
+    }  
+  }else{
+    tRefLCD = millis();  
+  }
 }
 
 void Actualizar_Posicion_HitBox(){
@@ -470,13 +493,11 @@ void Giro_Girito(struct Jugador *carro){
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         Angulo(carro->Control.Izquierda, carro->Control.Derecha,&carro->Giro.Posicion_Angular_Actual,&carro->Giro.Angulo);
         compVelocidad(carro->Movimiento.Velocidad, carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
-        LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
         carro->Giro.tGiro = millis();
       }else if(digitalRead(carro->Control.Derecha)&&(millis()-carro->Giro.tGiro)>=carro->Control.rateGiro){
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         Angulo(carro->Control.Izquierda, carro->Control.Derecha,&carro->Giro.Posicion_Angular_Actual,&carro->Giro.Angulo);
         compVelocidad(carro->Movimiento.Velocidad, carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
-        LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
         carro->Giro.tGiro = millis();
       }
       
@@ -523,7 +544,6 @@ void accionMovimiento(struct Jugador *carro){
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         compVelocidad(carro->Movimiento.Velocidad,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini,40, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);          
-        LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
         V_line( carro->Movimiento.posX - posX_ini, 180, 16,  0x632C); 
       }    
     }
@@ -569,7 +589,6 @@ void accionMovimiento(struct Jugador *carro){
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         compVelocidad(carro->Movimiento.Velocidad,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini,40, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);          
-        LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
         V_line( carro->Movimiento.posX - posX_ini, 180, 16,  0x632C); 
       }    
     }
@@ -603,7 +622,6 @@ void accionMovimiento(struct Jugador *carro){
       FillRect(150, 42, 2, 47, 0xF800); // Meta
       compVelocidad(carro->Movimiento.Velocidad*1000,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
       movimientoCarro(posX_ini,posY_ini,40, carro->Movimiento.velX/1000, carro->Movimiento.velY/1000, &carro->Movimiento.posX,&carro->Movimiento.posY);   
-      LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
       
       
       
