@@ -53,7 +53,9 @@ struct giro{
 struct movimiento{
   float Aceleracion;
   int enMovimiento;
+  int enFrenado;
   unsigned long tAceleracion;
+  unsigned long tFrenado;
   unsigned long tRebote;
   float Velocidad;
   float velX;
@@ -132,6 +134,7 @@ void setup() {
   J1.Control.Izquierda  = PA_3;
   J1.Control.Acelerador = PF_0;
   J1.Control.Drift      = PA_2;
+  J1.Control.Freno      = PA_5;
 
   // Valores de maniobra
   J1.Control.rateGiro   = 60;
@@ -142,6 +145,7 @@ void setup() {
   // Variables para entrar en las condiciones
   J1.Giro.enGiro = 0;
   J1.Movimiento.enMovimiento = 0;
+  J1.Movimiento.enFrenado = 0;
   J1.Movimiento.tRebote = 0;
   
   // Definir pos inicial de carrito 
@@ -158,7 +162,8 @@ void setup() {
   pinMode(J1.Control.Izquierda, INPUT_PULLUP);
   pinMode(J1.Control.Derecha, INPUT_PULLUP);
   pinMode(J1.Control.Acelerador, INPUT_PULLUP);
-  pinMode(J1.Control.Drift, INPUT_PULLUP);    
+  pinMode(J1.Control.Drift, INPUT_PULLUP);
+  pinMode(J1.Control.Freno, INPUT_PULLUP);    
 
   LCD_Bitmap(0, 0, 320, 240, Mapa_Pista1);
   LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
@@ -168,10 +173,15 @@ void setup() {
 //***************************************************************************************************************************************
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
-  J1.accion =!digitalRead(J1.Control.Acelerador);
+  J1.accion =!digitalRead(J1.Control.Acelerador) | !digitalRead(J1.Control.Freno);
   //choque  = 0;
   if(J1.accion){
-
+    Serial.println("Entro");
+    //**************************************************************************************************
+    //**************************************************************************************************
+    //**************************************BOTON DE ACELERADOR*****************************************
+    //**************************************************************************************************
+    //**************************************************************************************************
     // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
     if(!digitalRead(J1.Control.Acelerador) && !J1.Movimiento.enMovimiento){
       J1.Movimiento.tAceleracion = millis();
@@ -190,14 +200,14 @@ void loop() {
          * **********************************Código de Aceleración**************************************
          * ---------------------------------------------------------------------------------------------
          */
-        unsigned long rateVel;
-        unsigned long limiteRate = 25;
-
+  
         J1.Movimiento.Velocidad = J1.Movimiento.Velocidad + J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion);
 
         if(J1.Movimiento.Velocidad >= 0.015){
             J1.Movimiento.Velocidad = 0.015;
         }
+
+        
         
         compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
         movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
@@ -210,7 +220,52 @@ void loop() {
     if(digitalRead(J1.Control.Acelerador)&&J1.Movimiento.enMovimiento){
       J1.Movimiento.enMovimiento = 0;  
     }
-    
+
+    //**************************************************************************************************
+    //**************************************************************************************************
+    //****************************************BOTON DE FRENO********************************************
+    //**************************************************************************************************
+    //**************************************************************************************************
+    // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
+    Serial.println(J1.Movimiento.enFrenado);
+    if(!digitalRead(J1.Control.Freno) && !J1.Movimiento.enFrenado){
+      Serial.println("Frenando");
+      J1.Movimiento.tFrenado = millis();
+      J1.Movimiento.enFrenado = 1;   
+    }
+    // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
+    else if(!digitalRead(J1.Control.Freno) && J1.Movimiento.enFrenado){
+      
+      if(!digitalRead(J1.Control.Freno)&&(millis()-J1.Movimiento.tFrenado)>=20){
+         Condiciones_Colisones();
+         float posX_ini = J1.Movimiento.posX;
+         float posY_ini = J1.Movimiento.posY;
+         float  vel_ini = J1.Movimiento.Velocidad;
+
+        /* ---------------------------------------------------------------------------------------------
+         * **********************************Código de Frenado******************************************
+         * ---------------------------------------------------------------------------------------------
+         */
+  
+        J1.Movimiento.Velocidad = J1.Movimiento.Velocidad - 2*J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tFrenado);
+
+        if(J1.Movimiento.Velocidad <= 0){
+            J1.Movimiento.Velocidad = 0;
+        }
+
+        
+        
+        compVelocidad(J1.Movimiento.Velocidad,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
+        movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX, J1.Movimiento.velY, &J1.Movimiento.posX,&J1.Movimiento.posY);          
+        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+        V_line( J1.Movimiento.posX - posX_ini, 180, 16,  0x632C); 
+      }    
+    }
+
+    // Al soltar el acelerador, se sale de las condiciones y no se mueve
+    if(digitalRead(J1.Control.Freno)&&J1.Movimiento.enFrenado){
+      J1.Movimiento.enFrenado = 0;  
+    }
     
   }
   else{
