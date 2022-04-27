@@ -94,6 +94,7 @@ struct Pista{
 +----------------------------------------------------------------------------------+
 */
 void Condiciones_Colisones();
+void Giro_Girito();
 
 extern uint8_t Mapa_Pista1[];
 //extern uint8_t P_Inicio [];
@@ -165,7 +166,7 @@ void setup() {
 //***************************************************************************************************************************************
 void loop() {
   //Primero creamos la variable que nos dice si el usuario toco un boton
-  J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha) | !digitalRead(J1.Control.Acelerador);
+  J1.accion =!digitalRead(J1.Control.Acelerador);
   //choque  = 0;
   if(J1.accion){
 
@@ -188,7 +189,7 @@ void loop() {
          * ---------------------------------------------------------------------------------------------
          */
         unsigned long rateVel;
-        unsigned long limiteRate = 30;
+        unsigned long limiteRate = 25;
 
         J1.Movimiento.Velocidad = J1.Movimiento.Velocidad + J1.Movimiento.Aceleracion*(millis()-J1.Movimiento.tAceleracion);
 
@@ -208,45 +209,7 @@ void loop() {
       J1.Movimiento.enMovimiento = 0;  
     }
     
-    if(J1.accion && !J1.Giro.enGiro){
-      /* El usuario pulso un boton de giro
-       * por primera vez
-       */
-      J1.Giro.tGiro = millis();
-      J1.Giro.enGiro = 1;
-    }else if(J1.accion && J1.Giro.enGiro){
-      /*    
-       *     El carro gira cada J1.Control.rateGiro ms
-       *     J1.Control.turnoDrift
-       */
-      
-      if(!J1.Control.turnoDrift && !digitalRead(J1.Control.Drift)){
-        J1.Control.turnoDrift = 1;
-        J1.Control.rateGiro   = 20;
-                
-      }else if(J1.Control.turnoDrift && digitalRead(J1.Control.Drift)){
-        //J1.Control.turnoDrift = 0
-        J1.Control.rateGiro   = 60;
-        J1.Control.turnoDrift = 0;
-        
-      }
-             
-      if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
-        Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
-        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-        J1.Giro.tGiro = millis();
-      }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
-        Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
-        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-        J1.Giro.tGiro = millis();
-      }
-      
-    }
-    if(!J1.accion && J1.Giro.enGiro){
-      J1.Giro.enGiro = 0;  
-    }      
+    
   }
   else{
     if(!J1.Movimiento.enMovimiento){
@@ -267,16 +230,21 @@ void loop() {
         if(J1.Movimiento.Velocidad <= 0){
            J1.Movimiento.Velocidad = 0;
         }
-
+      
+      
       compVelocidad(J1.Movimiento.Velocidad*1000,J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
       movimientoCarro(posX_ini,posY_ini,20, J1.Movimiento.velX/1000, J1.Movimiento.velY/1000, &J1.Movimiento.posX,&J1.Movimiento.posY);   
-
-               
       LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+      
+      
+      
+      
       J1.Movimiento.enMovimiento = 0;   
       J1.Movimiento.tAceleracion = millis();
     }
   }
+
+  Giro_Girito();
 }
 
 void Condiciones_Colisones(){
@@ -400,6 +368,45 @@ void Condiciones_Colisones(){
 
 }
 
-
-  
-  
+void Giro_Girito(){
+  J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha);
+    if(J1.accion && !J1.Giro.enGiro){
+      /* El usuario pulso un boton de giro
+       * por primera vez
+       */
+      J1.Giro.tGiro = millis();
+      J1.Giro.enGiro = 1;
+    }else if(J1.accion && J1.Giro.enGiro){
+      /*    
+       *     El carro gira cada J1.Control.rateGiro ms
+       *     J1.Control.turnoDrift
+       */
+      
+      if(!J1.Control.turnoDrift && !digitalRead(J1.Control.Drift)){
+        J1.Control.turnoDrift = 1;
+        J1.Control.rateGiro   = 20;
+                
+      }else if(J1.Control.turnoDrift && digitalRead(J1.Control.Drift)){
+        //J1.Control.turnoDrift = 0
+        J1.Control.rateGiro   = 60;
+        J1.Control.turnoDrift = 0;
+        
+      }
+             
+      if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
+        Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
+        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
+        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+        J1.Giro.tGiro = millis();
+      }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
+        Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
+        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
+        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+        J1.Giro.tGiro = millis();
+      }
+      
+    }
+    if(!J1.accion && J1.Giro.enGiro){
+      J1.Giro.enGiro = 0;  
+    } 
+}
