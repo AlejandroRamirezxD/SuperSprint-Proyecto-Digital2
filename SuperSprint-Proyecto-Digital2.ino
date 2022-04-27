@@ -502,8 +502,8 @@ void accionMovimiento(struct Jugador *carro){
     // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
     else if(!digitalRead(carro->Control.Acelerador) && carro->Movimiento.enMovimiento){
       
-      if(!digitalRead(carro->Control.Acelerador)&&(millis()-carro->Movimiento.tAceleracion)>=20){
-        Condiciones_Colisones(&J1);
+      if(!digitalRead(carro->Control.Acelerador)&&(millis()-carro->Movimiento.tAceleracion)>=40){
+        Condiciones_Colisones(carro);
          float posX_ini = carro->Movimiento.posX;
          float posY_ini = carro->Movimiento.posY;
          float  vel_ini = carro->Movimiento.Velocidad;
@@ -522,7 +522,7 @@ void accionMovimiento(struct Jugador *carro){
         
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         compVelocidad(carro->Movimiento.Velocidad,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
-        movimientoCarro(posX_ini,posY_ini,20, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);          
+        movimientoCarro(posX_ini,posY_ini,40, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);          
         LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
         V_line( carro->Movimiento.posX - posX_ini, 180, 16,  0x632C); 
       }    
@@ -548,8 +548,8 @@ void accionMovimiento(struct Jugador *carro){
     // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
     else if(!digitalRead(carro->Control.Freno) && carro->Movimiento.enFrenado){
       
-      if(!digitalRead(carro->Control.Freno)&&(millis()-carro->Movimiento.tFrenado)>=20){
-         Condiciones_Colisones(&J1);
+      if(!digitalRead(carro->Control.Freno)&&(millis()-carro->Movimiento.tFrenado)>=40){
+         Condiciones_Colisones(carro);
          float posX_ini = carro->Movimiento.posX;
          float posY_ini = carro->Movimiento.posY;
          float  vel_ini = carro->Movimiento.Velocidad;
@@ -568,7 +568,7 @@ void accionMovimiento(struct Jugador *carro){
         
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         compVelocidad(carro->Movimiento.Velocidad,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
-        movimientoCarro(posX_ini,posY_ini,20, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);          
+        movimientoCarro(posX_ini,posY_ini,40, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);          
         LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
         V_line( carro->Movimiento.posX - posX_ini, 180, 16,  0x632C); 
       }    
@@ -587,7 +587,7 @@ void accionMovimiento(struct Jugador *carro){
     }
     else if(carro->Movimiento.enMovimiento == 1 && (millis()-carro->Movimiento.tAceleracion)>=2){
 
-      Condiciones_Colisones(&J1);
+      Condiciones_Colisones(carro);
       
       float posX_ini = carro->Movimiento.posX;
       float posY_ini = carro->Movimiento.posY;
@@ -602,7 +602,7 @@ void accionMovimiento(struct Jugador *carro){
       
       FillRect(150, 42, 2, 47, 0xF800); // Meta
       compVelocidad(carro->Movimiento.Velocidad*1000,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
-      movimientoCarro(posX_ini,posY_ini,20, carro->Movimiento.velX/1000, carro->Movimiento.velY/1000, &carro->Movimiento.posX,&carro->Movimiento.posY);   
+      movimientoCarro(posX_ini,posY_ini,40, carro->Movimiento.velX/1000, carro->Movimiento.velY/1000, &carro->Movimiento.posX,&carro->Movimiento.posY);   
       LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
       
       
