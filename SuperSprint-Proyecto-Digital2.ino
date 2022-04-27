@@ -249,7 +249,7 @@ void loop() {
     else if(!digitalRead(J1.Control.Acelerador) && J1.Movimiento.enMovimiento){
       
       if(!digitalRead(J1.Control.Acelerador)&&(millis()-J1.Movimiento.tAceleracion)>=20){
-        Condiciones_Colisones();
+        Condiciones_Colisones(&J1);
          float posX_ini = J1.Movimiento.posX;
          float posY_ini = J1.Movimiento.posY;
          float  vel_ini = J1.Movimiento.Velocidad;
@@ -295,7 +295,7 @@ void loop() {
     else if(!digitalRead(J1.Control.Freno) && J1.Movimiento.enFrenado){
       
       if(!digitalRead(J1.Control.Freno)&&(millis()-J1.Movimiento.tFrenado)>=20){
-         Condiciones_Colisones();
+         Condiciones_Colisones(&J1);
          float posX_ini = J1.Movimiento.posX;
          float posY_ini = J1.Movimiento.posY;
          float  vel_ini = J1.Movimiento.Velocidad;
@@ -333,7 +333,7 @@ void loop() {
     }
     else if(J1.Movimiento.enMovimiento == 1 && (millis()-J1.Movimiento.tAceleracion)>=2){
 
-      Condiciones_Colisones();
+      Condiciones_Colisones(&J1);
       
       float posX_ini = J1.Movimiento.posX;
       float posY_ini = J1.Movimiento.posY;
@@ -359,7 +359,7 @@ void loop() {
     }
   }
 
-  Giro_Girito();
+  Giro_Girito(&J1);
 }
 
 void Actualizar_Posicion_HitBox(){
@@ -424,10 +424,10 @@ void Actualizar_Posicion_HitBox(){
   Serial.println(J1.HitBox.d.y);*/
 }
 
-void Condiciones_Colisones(){
-  float posX_ini = J1.Movimiento.posX;
-  float posY_ini = J1.Movimiento.posY;
-  float  vel_ini = J1.Movimiento.Velocidad;
+void Condiciones_Colisones(struct Jugador *carro){
+  float posX_ini = carro->Movimiento.posX;
+  float posY_ini = carro->Movimiento.posY;
+  float  vel_ini = carro->Movimiento.Velocidad;
   
   // El sprite se encuentra dentro del borde exterior en coordenadas x
   if( posX_ini > Pista1.Limites.xo && posX_ini < Pista1.Limites.xf){
@@ -441,151 +441,151 @@ void Condiciones_Colisones(){
   //--------------------------Verificacion de limites de las paredes---------------------------
   //*******************************Sentido Antihorario*****************************************
   //Pared inferior
-  if(posY_ini>=Pista1.Limites.yf && J1.Giro.Angulo>=270){
-    J1.Giro.Angulo = normAngulo(J1.Giro.Angulo);
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+  if(posY_ini>=Pista1.Limites.yf && carro->Giro.Angulo>=270){
+    J1.Giro.Angulo = normAngulo(carro->Giro.Angulo);
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual); 
     choque = 1;
     //Serial.println("1");
   }
   //Pared derecha
-  else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo<=90&& J1.Giro.Angulo>=0 ){
-    J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+90;
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);
+  else if(posX_ini>=Pista1.Limites.xf && carro->Giro.Angulo<=90&& carro->Giro.Angulo>=0 ){
+    carro->Giro.Angulo = (90-normAngulo(carro->Giro.Angulo))+90;
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual);
     choque = 1;
     //Serial.println("2");
   }
   //Pared superior
-  else if(posY_ini<=Pista1.Limites.yo && J1.Giro.Angulo<=180 && J1.Giro.Angulo>=90){
-    J1.Giro.Angulo = normAngulo(J1.Giro.Angulo)+180;
-    J1.Movimiento.posY = Pista1.Limites.yo -1;
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+  else if(posY_ini<=Pista1.Limites.yo && carro->Giro.Angulo<=180 && carro->Giro.Angulo>=90){
+    carro->Giro.Angulo = normAngulo(carro->Giro.Angulo)+180;
+    carro->Movimiento.posY = Pista1.Limites.yo -1;
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual); 
     choque = 1;
     //Serial.println("3"); 
   }
   //Pared izquierda
-  else if(posX_ini<=Pista1.Limites.xo && J1.Giro.Angulo>=180 && J1.Giro.Angulo<=270){
+  else if(posX_ini<=Pista1.Limites.xo && carro->Giro.Angulo>=180 && carro->Giro.Angulo<=270){
     choque = 1;
     //Serial.println("4"); 
-    J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+270;
-    if(J1.Giro.Angulo == 360){
-      J1.Giro.Angulo = 0;
+    carro->Giro.Angulo = (90-normAngulo(carro->Giro.Angulo))+270;
+    if(carro->Giro.Angulo == 360){
+      carro->Giro.Angulo = 0;
     }
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);   
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual);   
   }
   //--------------------------Verificacion de limites de las paredes---------------------------
   //***********************************Sentido Horario*****************************************
   //Pared inferior
-  if(posY_ini>=Pista1.Limites.yf && J1.Giro.Angulo<=270 && J1.Giro.Angulo>=180){
-    J1.Giro.Angulo = 180 - normAngulo(J1.Giro.Angulo);
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);
+  if(posY_ini>=Pista1.Limites.yf && carro->Giro.Angulo<=270 && carro->Giro.Angulo>=180){
+    carro->Giro.Angulo = 180 - normAngulo(carro->Giro.Angulo);
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual);
     choque = 1; 
     //Serial.println("5"); 
-    J1.Movimiento.tRebote = millis();
+    carro->Movimiento.tRebote = millis();
   }
   //Pared derecha
-  else if(posX_ini>=Pista1.Limites.xf && J1.Giro.Angulo>=270 && J1.Giro.Angulo<=360){
+  else if(posX_ini>=Pista1.Limites.xf && carro->Giro.Angulo>=270 && carro->Giro.Angulo<=360){
     //Serial.println("6"); 
     choque = 1;
-    J1.Movimiento.tRebote = millis();
-    J1.Giro.Angulo = 270 - (90-normAngulo(J1.Giro.Angulo));
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);             
+    carro->Movimiento.tRebote = millis();
+    carro->Giro.Angulo = 270 - (90-normAngulo(carro->Giro.Angulo));
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual);             
   }
   //Pared superior
-  else if(posY_ini<=Pista1.Limites.yo && J1.Giro.Angulo<=180 && J1.Giro.Angulo<=90){
-    J1.Giro.Angulo = 360 - normAngulo(J1.Giro.Angulo);
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+  else if(posY_ini<=Pista1.Limites.yo && carro->Giro.Angulo<=180 && carro->Giro.Angulo<=90){
+    carro->Giro.Angulo = 360 - normAngulo(carro->Giro.Angulo);
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual); 
     Serial.println("7"); 
-    J1.Movimiento.tRebote = millis();
+    carro->Movimiento.tRebote = millis();
   }
   //Pared izquierda
-  else if(posX_ini<=Pista1.Limites.xo && J1.Giro.Angulo>=90 && J1.Giro.Angulo<=180){
-    J1.Giro.Angulo = 90 - (90-normAngulo(J1.Giro.Angulo));
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+  else if(posX_ini<=Pista1.Limites.xo && carro->Giro.Angulo>=90 && carro->Giro.Angulo<=180){
+    carro->Giro.Angulo = 90 - (90-normAngulo(carro->Giro.Angulo));
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual); 
     choque = 1;  
     //Serial.println("8"); 
-    J1.Movimiento.tRebote = millis();
+    carro->Movimiento.tRebote = millis();
   }
   //--------------------------Verificacion de limites de borde interior---------------------------
   //***********************************Sentido Horario*****************************************
    //Pared Superior
-  if(posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif && J1.Giro.Angulo>=270 && J1.Giro.Angulo<=360 && posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif ){
-    J1.Giro.Angulo = normAngulo(J1.Giro.Angulo);
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+  if(posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif && carro->Giro.Angulo>=270 && carro->Giro.Angulo<=360 && posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif ){
+    carro->Giro.Angulo = normAngulo(carro->Giro.Angulo);
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual); 
     choque = 1;
-    J1.Movimiento.tRebote = millis();
+    carro->Movimiento.tRebote = millis();
     //Serial.println("9"); 
   }
   //Pared derecha
-  else if(posX_ini<=Pista1.Limites.xif && posX_ini>=Pista1.Limites.xio && J1.Giro.Angulo>=180 && J1.Giro.Angulo<=270 && posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif ){
+  else if(posX_ini<=Pista1.Limites.xif && posX_ini>=Pista1.Limites.xio && carro->Giro.Angulo>=180 && carro->Giro.Angulo<=270 && posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif ){
     //Serial.println("10"); 
     choque = 1;
-    J1.Movimiento.tRebote = millis();
-    J1.Giro.Angulo = (90-normAngulo(J1.Giro.Angulo))+270;
-    if(J1.Giro.Angulo == 360){
-      J1.Giro.Angulo = 0;
+    carro->Movimiento.tRebote = millis();
+    carro->Giro.Angulo = (90-normAngulo(carro->Giro.Angulo))+270;
+    if(carro->Giro.Angulo == 360){
+      carro->Giro.Angulo = 0;
     }
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);           
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual);           
   }
   //Pared inferior
-  else if(posY_ini<=Pista1.Limites.yif && posY_ini>=Pista1.Limites.yio && J1.Giro.Angulo>=90&& J1.Giro.Angulo<=180 && posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif ){
-    J1.Giro.Angulo = normAngulo(J1.Giro.Angulo)+180;
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual); 
+  else if(posY_ini<=Pista1.Limites.yif && posY_ini>=Pista1.Limites.yio && carro->Giro.Angulo>=90&& carro->Giro.Angulo<=180 && posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif ){
+    carro->Giro.Angulo = normAngulo(carro->Giro.Angulo)+180;
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual); 
     choque = 1;
     //Serial.println("12"); 
-    J1.Movimiento.tRebote = millis();
+    carro->Movimiento.tRebote = millis();
   }
   //Pared izquierda
-  else if(posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif && J1.Giro.Angulo>=0 && J1.Giro.Angulo<=90 && posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif){
-    J1.Giro.Angulo = 90-normAngulo(J1.Giro.Angulo)+90;
-    Angulo_Cambia_Pos_Angular(J1.Giro.Angulo,&J1.Giro.Posicion_Angular_Actual);   
+  else if(posX_ini>=Pista1.Limites.xio && posX_ini<=Pista1.Limites.xif && carro->Giro.Angulo>=0 && carro->Giro.Angulo<=90 && posY_ini>=Pista1.Limites.yio && posY_ini<=Pista1.Limites.yif){
+    carro->Giro.Angulo = 90-normAngulo(carro->Giro.Angulo)+90;
+    Angulo_Cambia_Pos_Angular(carro->Giro.Angulo,&carro->Giro.Posicion_Angular_Actual);   
     choque = 1;
     //Serial.println("13"); 
-    J1.Movimiento.tRebote = millis();
+    carro->Movimiento.tRebote = millis();
   }
 
 }
 
-void Giro_Girito(){
-  J1.accion = !digitalRead(J1.Control.Izquierda) | !digitalRead(J1.Control.Derecha);
-    if(J1.accion && !J1.Giro.enGiro){
+void Giro_Girito(struct Jugador *carro){
+  carro->accion = !digitalRead(carro->Control.Izquierda) | !digitalRead(carro->Control.Derecha);
+    if(carro->accion && !carro->Giro.enGiro){
       /* El usuario pulso un boton de giro
        * por primera vez
        */
-      J1.Giro.tGiro = millis();
-      J1.Giro.enGiro = 1;
-    }else if(J1.accion && J1.Giro.enGiro){
+      carro->Giro.tGiro = millis();
+      carro->Giro.enGiro = 1;
+    }else if(carro->accion && carro->Giro.enGiro){
       /*    
-       *     El carro gira cada J1.Control.rateGiro ms
-       *     J1.Control.turnoDrift
+       *     El carro gira cada carro->Control.rateGiro ms
+       *     carro->Control.turnoDrift
        */
       
-      if(!J1.Control.turnoDrift && !digitalRead(J1.Control.Drift)){
-        J1.Control.turnoDrift = 1;
-        J1.Control.rateGiro   = 20;
+      if(!carro->Control.turnoDrift && !digitalRead(carro->Control.Drift)){
+        carro->Control.turnoDrift = 1;
+        carro->Control.rateGiro   = 20;
                 
-      }else if(J1.Control.turnoDrift && digitalRead(J1.Control.Drift)){
-        //J1.Control.turnoDrift = 0
-        J1.Control.rateGiro   = 60;
-        J1.Control.turnoDrift = 0;
+      }else if(carro->Control.turnoDrift && digitalRead(carro->Control.Drift)){
+        //carro->Control.turnoDrift = 0
+        carro->Control.rateGiro   = 60;
+        carro->Control.turnoDrift = 0;
         
       }
              
-      if(digitalRead(J1.Control.Izquierda)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
+      if(digitalRead(carro->Control.Izquierda)&&(millis()-carro->Giro.tGiro)>=carro->Control.rateGiro){
         FillRect(150, 42, 2, 47, 0xF800); // Meta
-        Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
-        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-        J1.Giro.tGiro = millis();
-      }else if(digitalRead(J1.Control.Derecha)&&(millis()-J1.Giro.tGiro)>=J1.Control.rateGiro){
+        Angulo(carro->Control.Izquierda, carro->Control.Derecha,&carro->Giro.Posicion_Angular_Actual,&carro->Giro.Angulo);
+        compVelocidad(carro->Movimiento.Velocidad, carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
+        LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
+        carro->Giro.tGiro = millis();
+      }else if(digitalRead(carro->Control.Derecha)&&(millis()-carro->Giro.tGiro)>=carro->Control.rateGiro){
         FillRect(150, 42, 2, 47, 0xF800); // Meta
-        Angulo(J1.Control.Izquierda, J1.Control.Derecha,&J1.Giro.Posicion_Angular_Actual,&J1.Giro.Angulo);
-        compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
-        LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-        J1.Giro.tGiro = millis();
+        Angulo(carro->Control.Izquierda, carro->Control.Derecha,&carro->Giro.Posicion_Angular_Actual,&carro->Giro.Angulo);
+        compVelocidad(carro->Movimiento.Velocidad, carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
+        LCD_Sprite(carro->Movimiento.posX,carro->Movimiento.posY,16,16,CarritoConPrivilegios,32,carro->Giro.Posicion_Angular_Actual,0,0);
+        carro->Giro.tGiro = millis();
       }
       
     }
-    if(!J1.accion && J1.Giro.enGiro){
-      J1.Giro.enGiro = 0;  
+    if(!carro->accion && carro->Giro.enGiro){
+      carro->Giro.enGiro = 0;  
     } 
 }
