@@ -249,10 +249,10 @@ void setup() {
   drawJ1 = 0;
   drawJ2 = 0;
 
-  LCD_Bitmap(0, 0, 320, 240, Mapa_Pista1);
-  FillRect(150, 42, 2, 47, 0xF800); // Meta
-  LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,0,0,0); // Mostrar carrito
-  LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,0,0,0); // Mostrar carrito
+  //Iniciamos en modo de pantalla de inicio
+  modo = 1;
+  modoInit = 0;
+  gameMode = 1;
 }
 //***************************************************************************************************************************************
 // LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP
