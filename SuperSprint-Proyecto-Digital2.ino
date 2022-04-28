@@ -10,6 +10,8 @@
 |                                    LIBRERIAS                                     |                                   
 +----------------------------------------------------------------------------------+
 */
+#include <SPI.h>
+#include <SD.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <TM4C123GH6PM.h>
@@ -30,6 +32,12 @@
 |                                VARIABLES Y STRUCTS                               |                                   
 +----------------------------------------------------------------------------------+
 */
+
+//Variables de la SD
+File archivo, fondo;
+
+char selArch, modo, modoInit, gameMode;
+
 // Sub struct de la variables relacionadas al mando 
 struct control{
   int Izquierda;
@@ -128,6 +136,7 @@ extern uint8_t CarritoSinPrivilegios[];
 // Inicialización
 //***************************************************************************************************************************************
 void setup() {
+  //Inicialización de la TFT
   SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
   Serial.begin(115200);
   Serial3.begin(115200);
@@ -135,6 +144,27 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x632C);
+
+  //Inicialización de la SD
+  //Iniciamos la comunicación serial SPI
+  Serial.begin(115200);
+  SPI.setModule(0);
+
+  //Comenzamos la inicialización, no sin antes indicarlo en la consola
+  Serial.println("Inicializando SD...");
+  //Configuramos el CS como OUTPUT
+  pinMode(PB_5, OUTPUT);
+  //Verificamos la conexión con el SD
+  if(!SD.begin(32)){
+      Serial.println("¡¡Falla en la inicialización!!");
+      //En caso de no estar conectada salimos del setup
+      return;
+    }
+  //En caso de estar conectado lo indicamos en la consola
+  Serial.println("Inicialización exitosa :)");
+
+  //Guardamos los directorios de la SD en la variable archivo
+  archivo = SD.open("/");
     
   // Limites asociados a la pista1
   // Borde exterior
@@ -731,3 +761,198 @@ void verificacion_Botones(){
     break;
   }
 }
+
+void SD_to_LCD(unsigned int x, unsigned int y, unsigned int width, unsigned int height, File bitmap) {
+  LCD_CMD(0x02c); // write_memory_start
+  digitalWrite(LCD_RS, HIGH);
+  digitalWrite(LCD_CS, LOW);
+
+  unsigned int x2, y2;
+  x2 = x + width;
+  y2 = y + height;
+  SetWindows(x, y, x2 - 1, y2 - 1);
+  unsigned int k = 0;
+  unsigned int i, j;
+  //Mientras haya algo que leer en el archivo lo leemos
+  char texto[2];
+      //Mientras haya algo que leer en el archivo lo leemos
+  while(bitmap.available()){
+      char valorleido = bitmap.read();
+      //Serial.println(texto);
+      if(valorleido == 'x'){
+        texto[0] = bitmap.read();
+        texto[1] = bitmap.read();
+        for(int a = 0; a<=1; a++){
+          if((texto[a]-48) > 9){
+            texto[a] = texto[a]-87;  
+          }else{
+            texto[a] = texto[a]-48;
+          }
+        }
+        unsigned char numero = (texto[0])*16 + (texto[1]);
+        LCD_DATA(numero);
+      }
+  }
+  bitmap.close(); 
+  
+  digitalWrite(LCD_CS, HIGH);
+}
+
+//****************************************************************************************
+//****************************************************************************************
+//******************************************Inicio****************************************
+//****************************************************************************************
+//****************************************************************************************
+void inicio(){                                                          //****************
+    if(!modoInit){
+      //Imprimimos la pantalla de inicio
+      fondo = SD.open("inicio.txt");
+      SD_to_LCD(0,0,320,240,fondo);
+      LCD_Print("Acelera!!!", 235, 200, 1, 0xffff, 0);
+      //Indicamos que se ha salido de la inicialización del modo
+      modoInit = 1;  
+    }
+    else{
+      if(J1.Control.Acelerador){
+        modo = 2;
+        //Activamos la inicialización para el siguiente modo
+        modoInit = 0;  
+      }
+    }
+    
+}                                                                       //****************
+//****************************************************************************************
+//****************************************************************************************
+
+//****************************************************************************************
+//****************************************************************************************
+//******************************************Menu******************************************
+//****************************************************************************************
+//****************************************************************************************
+void menu(){
+  if(!modoInit){
+    //Imprimimos el menu
+    fondo = SD.open("menu.txt");
+    SD_to_LCD(0,0,320,240,fondo);
+    LCD_Print("1 Jugador", 85, 140, 2, 0xffff, 0x0196);
+    LCD_Print("2 Jugadores", 75, 170, 2, 0xffff, 0x0196);
+    //Indicamos que se ha salido de la inicialización del modo
+    modoInit = 1;  
+  }
+  else{
+    if(J1.Control.Acelerador){
+      switch(gameMode){
+        case 1:
+          modo = 3;
+        break;
+        case 2:
+          modo = 4;
+        break;  
+      }
+      //Se setea para que se haga la inicializacion del siguiente modo
+      modoInit = 0;  
+    }
+    if(J1.Control.Derecha) {
+      int bitmapX = 60;
+      int bitmapY[2] = {140, 170};
+      gameMode++;
+      if(gameMode>2){
+        gameMode = 1;  
+      }
+      fondo = SD.open("selmode.txt");
+      FillRect(60, 140, 16, 40, 0x0196);
+      SD_to_LCD(bitmapX,bitmapY[gameMode-1],16,16,fondo);
+      while(J1.Control.Derecha);  
+    } 
+  }
+}
+//****************************************************************************************
+//****************************************************************************************
+
+//****************************************************************************************
+//****************************************************************************************
+//*************************************MODO 1 JUGADOR*************************************
+//****************************************************************************************
+//****************************************************************************************
+void modo_1J(){
+  
+  if(!modoInit){
+    //Imprimimos la pista
+    fondo = SD.open("pista1.txt");
+    SD_to_LCD(0,0,320,240,fondo);
+    //Indicamos que la inicialización ha terminado
+    modoInit = 1;
+  }
+  else{
+    //Se ejecuta el código del juego
+  }
+}
+//****************************************************************************************
+//****************************************************************************************
+
+//****************************************************************************************
+//****************************************************************************************
+//*************************************MODO 2 JUGADOR*************************************
+//****************************************************************************************
+//****************************************************************************************
+void modo_2J(){
+  if(!modoInit){
+    //Imprimimos la pista
+    fondo = SD.open("pista1.txt");
+    SD_to_LCD(0,0,320,240,fondo);
+    //Indicamos que la inicialización ha terminado
+    modoInit = 1;
+  }
+  else{
+    //Se ejecuta el código del juego
+    verificacion_Botones();
+    //Primero creamos la variable que nos dice si el usuario toco un boton
+    J1.accion = J1.Control.Acelerador | J1.Control.Freno;
+    J2.accion = J2.Control.Acelerador | J2.Control.Freno;
+    Actualizar_Posicion_HitBox();
+    
+    
+    Meta.HitBox.a.x = 150;
+    Meta.HitBox.a.y = 42;
+    Meta.HitBox.b.x = 150+2;
+    Meta.HitBox.b.y = 42;
+    Meta.HitBox.c.x = 150;
+    Meta.HitBox.c.y = 42+31;
+    Meta.HitBox.d.x = 150+2;;
+    Meta.HitBox.d.y = 42+31;
+  
+    
+   
+    //choque  = 0;
+    accionMovimiento(&J1);
+    accionMovimiento(&J2);
+  
+    Giro_Girito(&J1);
+    Giro_Girito(&J2);
+  
+    
+  
+    // CarritoConPrivilegios
+    if(!drawJ1 && !tRefLCD_2){
+      drawJ1 = 1;
+      tRefLCD = millis();
+    }else if((millis() - tRefLCD )>25){
+      LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+    }else if((millis() - tRefLCD )>25 && drawJ1 == 1){
+      drawJ1 = 0;
+      tRefLCD_2 = (millis() - tRefLCD );
+    }
+    
+    if(!drawJ2 && tRefLCD_2 > 25){
+      drawJ2 = 1;
+      tRefLCD = millis();
+    }else if((millis() - tRefLCD )>50){
+      LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,J2.Giro.Posicion_Angular_Actual,0,0);
+    }else if((millis() - tRefLCD )>25 && drawJ2 == 1){
+      drawJ2 = 0;
+      tRefLCD_2 = 0;
+    }
+  }
+}
+//****************************************************************************************
+//****************************************************************************************
