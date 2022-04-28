@@ -259,53 +259,23 @@ void setup() {
 //***************************************************************************************************************************************
 void loop() {
   verificacion_Botones();
-  //Primero creamos la variable que nos dice si el usuario toco un boton
-  J1.accion = J1.Control.Acelerador | J1.Control.Freno;
-  J2.accion = J2.Control.Acelerador | J2.Control.Freno;
-  Actualizar_Posicion_HitBox();
-  
-  
-  Meta.HitBox.a.x = 150;
-  Meta.HitBox.a.y = 42;
-  Meta.HitBox.b.x = 150+2;
-  Meta.HitBox.b.y = 42;
-  Meta.HitBox.c.x = 150;
-  Meta.HitBox.c.y = 42+31;
-  Meta.HitBox.d.x = 150+2;;
-  Meta.HitBox.d.y = 42+31;
-
-  
- 
-  //choque  = 0;
-  accionMovimiento(&J1);
-  accionMovimiento(&J2);
-
-  Giro_Girito(&J1);
-  Giro_Girito(&J2);
-
-  
-
-  // CarritoConPrivilegios
-  if(!drawJ1 && !tRefLCD_2){
-    drawJ1 = 1;
-    tRefLCD = millis();
-  }else if((millis() - tRefLCD )>25){
-    LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
-  }else if((millis() - tRefLCD )>25 && drawJ1 == 1){
-    drawJ1 = 0;
-    tRefLCD_2 = (millis() - tRefLCD );
+  switch(modo){
+    case 1:
+      inicio();
+    break;
+    case 2:
+      menu();
+    break;
+    case 3:
+      modo_1J();
+    break;
+    case 4:
+      inicio();
+    break;
+    default:
+      modo = 1;
+    break;  
   }
-  
-  if(!drawJ2 && tRefLCD_2 > 25){
-    drawJ2 = 1;
-    tRefLCD = millis();
-  }else if((millis() - tRefLCD )>50){
-    LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,J2.Giro.Posicion_Angular_Actual,0,0);
-  }else if((millis() - tRefLCD )>25 && drawJ2 == 1){
-    drawJ2 = 0;
-    tRefLCD_2 = 0;
-  }
-
   
 }
 //***************************************************************************************************************************************
