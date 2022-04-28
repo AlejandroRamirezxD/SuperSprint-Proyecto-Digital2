@@ -50,7 +50,7 @@ int PosicionMap(int Posicion){
 }
 
 void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual, float *Angulo ){
-  if(!digitalRead(Push_Izquierdo)){
+  if(Push_Izquierdo){
     *Posicion_Angular_Actual = *Posicion_Angular_Actual + 1;
     
     if(*Posicion_Angular_Actual  > 31){
@@ -59,7 +59,7 @@ void Angulo (int Push_Izquierdo, int Push_Derecho, int *Posicion_Angular_Actual,
     
     *Posicion_Angular_Actual = PosicionMap(*Posicion_Angular_Actual);
   }
-  else if(!digitalRead(Push_Derecho)){
+  else if(Push_Derecho){
     *Posicion_Angular_Actual = *Posicion_Angular_Actual - 1;
     if(*Posicion_Angular_Actual  < -31){
       *Posicion_Angular_Actual = 0;
