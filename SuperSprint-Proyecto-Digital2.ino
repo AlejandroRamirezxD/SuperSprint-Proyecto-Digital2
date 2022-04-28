@@ -242,32 +242,32 @@ void setup() {
 //***************************************************************************************************************************************
 void loop() {
 
-  while(Serial3.available()>0){
-    String  valorLeido = Serial3.readStringUntil('M');
-    J1I  = valorLeido.substring(0,1);
-    J1D  = valorLeido.substring(1,2);
-    J1A  = valorLeido.substring(2,3);
-    J1Dr = valorLeido.substring(3,4);
-    J1F  = valorLeido.substring(4,5);
-    J2I  = valorLeido.substring(5,6);
-    J2D  = valorLeido.substring(6,7);
-    J2A  = valorLeido.substring(7,8);
-    J2Dr = valorLeido.substring(8,9);
-    J2F  = valorLeido.substring(9,10);
-    break;
+  if(Serial3.available()>0){
+    //String  valorLeido = Serial3.readStringUntil('M');
+//    J1I  = valorLeido.substring(0,1);
+//    J1D  = valorLeido.substring(1,2);
+    J1A  = Serial.read();
+//    J1Dr = valorLeido.substring(3,4);
+//    J1F  = valorLeido.substring(4,5);
+//    J2I  = valorLeido.substring(5,6);
+//    J2D  = valorLeido.substring(6,7);
+//    J2A  = valorLeido.substring(7,8);
+//    J2Dr = valorLeido.substring(8,9);
+//    J2F  = valorLeido.substring(9,10);
+    //break;
   }
   
-  J1.Control.Izquierda  = J1I.toInt();
-  J1.Control.Derecha    = J1D.toInt();
+//  J1.Control.Izquierda  = J1I.toInt();
+//  J1.Control.Derecha    = J1D.toInt();
   J1.Control.Acelerador = J1A.toInt();
-  J1.Control.Freno      = J1Dr.toInt();
-  J1.Control.Drift      = J1F.toInt();
-
-  J2.Control.Izquierda  = J2I.toInt();
-  J2.Control.Derecha    = J2D.toInt();
-  J2.Control.Acelerador = J2A.toInt();
-  J2.Control.Freno      = J2Dr.toInt();
-  J2.Control.Drift      = J2F.toInt();
+//  J1.Control.Freno      = J1Dr.toInt();
+//  J1.Control.Drift      = J1F.toInt();
+//
+//  J2.Control.Izquierda  = J2I.toInt();
+//  J2.Control.Derecha    = J2D.toInt();
+//  J2.Control.Acelerador = J2A.toInt();
+//  J2.Control.Freno      = J2Dr.toInt();
+//  J2.Control.Drift      = J2F.toInt();
 //  Serial.print("jsjsj");
 //  Serial.print(J1.Control.Izquierda);
 //  Serial.print(J1.Control.Derecha);
@@ -662,7 +662,7 @@ void accionMovimiento(struct Jugador *carro){
       carro->Movimiento.tAceleracion = millis();
       carro->Movimiento.enMovimiento = 1;  
     }
-    else if(carro->Movimiento.enMovimiento == 1 && (millis()-carro->Movimiento.tAceleracion)>=40){
+    else if(carro->Movimiento.enMovimiento == 1 && (millis()-carro->Movimiento.tAceleracion)>=2){
 
       Condiciones_Colisones(carro);
       
@@ -671,7 +671,7 @@ void accionMovimiento(struct Jugador *carro){
       float  vel_ini = carro->Movimiento.Velocidad;
       
       
-      carro->Movimiento.Velocidad = vel_ini - carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tAceleracion)*0.99;
+      carro->Movimiento.Velocidad = vel_ini - carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tAceleracion)*50;
       
         if(carro->Movimiento.Velocidad <= 0){
            carro->Movimiento.Velocidad = 0;
