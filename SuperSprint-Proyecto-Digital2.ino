@@ -101,6 +101,18 @@ struct limites{
   float yif;
 };
 
+String J1I;
+String J1D;
+String J1A;
+String J1Dr;
+String J1F;
+
+String J2I;
+String J2D;
+String J2A;
+String J2Dr;
+String J2F;
+
 unsigned long tRefLCD;
 unsigned long  tRefLCD_2 ;
 
@@ -130,6 +142,7 @@ extern uint8_t CarritoSinPrivilegios[];
 void setup() {
   SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
   Serial.begin(115200);
+  Serial3.begin(115200);
   GPIOPadConfigSet(GPIO_PORTB_BASE, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
   Serial.println("Inicio");
   LCD_Init();
@@ -148,20 +161,7 @@ void setup() {
   Pista1.Limites.yif = 169;
   Pista1.Limites.yio = 73;
   
-  // Pines asociados a botones
-  J1.Control.Derecha    = PA_4;
-  J1.Control.Izquierda  = PA_3;
-  J1.Control.Acelerador = PF_0;
-  J1.Control.Drift      = PA_2;
-  J1.Control.Freno      = PA_5;
-
-  // Pines asociados a botones
-  J2.Control.Derecha    = PF_4;
-  J2.Control.Izquierda  = PD_7;
-  J2.Control.Acelerador = PA_7;
-  J2.Control.Drift      = PC_5;
-  J2.Control.Freno      = PE_3;
-
+  
   // Valores de maniobra
   J1.Control.rateGiro   = 60;
   J1.Control.turnoDrift = 0;
@@ -219,17 +219,18 @@ void setup() {
   drawJ2 = 0;
   
   //pinMode(Push_Acelerar_J1,INPUT_PULLUP);
-  pinMode(J1.Control.Izquierda, INPUT_PULLUP);
-  pinMode(J1.Control.Derecha, INPUT_PULLUP);
-  pinMode(J1.Control.Acelerador, INPUT_PULLUP);
-  pinMode(J1.Control.Drift, INPUT_PULLUP);
-  pinMode(J1.Control.Freno, INPUT_PULLUP);    
-
-  pinMode(J2.Control.Izquierda, INPUT_PULLUP);
-  pinMode(J2.Control.Derecha, INPUT_PULLUP);
-  pinMode(J2.Control.Acelerador, INPUT_PULLUP);
-  pinMode(J2.Control.Drift, INPUT_PULLUP);
-  pinMode(J2.Control.Freno, INPUT_PULLUP);  
+//  
+//  pinMode(J1.Control.Izquierda, INPUT_PULLUP);
+//  pinMode(J1.Control.Derecha, INPUT_PULLUP);
+//  pinMode(J1.Control.Acelerador, INPUT_PULLUP);
+//  pinMode(J1.Control.Drift, INPUT_PULLUP);
+//  pinMode(J1.Control.Freno, INPUT_PULLUP);    
+//
+//  pinMode(J2.Control.Izquierda, INPUT_PULLUP);
+//  pinMode(J2.Control.Derecha, INPUT_PULLUP);
+//  pinMode(J2.Control.Acelerador, INPUT_PULLUP);
+//  pinMode(J2.Control.Drift, INPUT_PULLUP);
+//  pinMode(J2.Control.Freno, INPUT_PULLUP);  
 
   LCD_Bitmap(0, 0, 320, 240, Mapa_Pista1);
   FillRect(150, 42, 2, 47, 0xF800); // Meta
@@ -240,9 +241,48 @@ void setup() {
 // LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP
 //***************************************************************************************************************************************
 void loop() {
+
+  while(Serial3.available()>0){
+    String  valorLeido = Serial3.readStringUntil('M');
+    J1I  = valorLeido.substring(0,1);
+    J1D  = valorLeido.substring(1,2);
+    J1A  = valorLeido.substring(2,3);
+    J1Dr = valorLeido.substring(3,4);
+    J1F  = valorLeido.substring(4,5);
+    J2I  = valorLeido.substring(5,6);
+    J2D  = valorLeido.substring(6,7);
+    J2A  = valorLeido.substring(7,8);
+    J2Dr = valorLeido.substring(8,9);
+    J2F  = valorLeido.substring(9,10);
+    break;
+  }
+  
+  J1.Control.Izquierda  = J1I.toInt();
+  J1.Control.Derecha    = J1D.toInt();
+  J1.Control.Acelerador = J1A.toInt();
+  J1.Control.Freno      = J1Dr.toInt();
+  J1.Control.Drift      = J1F.toInt();
+
+  J2.Control.Izquierda  = J2I.toInt();
+  J2.Control.Derecha    = J2D.toInt();
+  J2.Control.Acelerador = J2A.toInt();
+  J2.Control.Freno      = J2Dr.toInt();
+  J2.Control.Drift      = J2F.toInt();
+//  Serial.print("jsjsj");
+//  Serial.print(J1.Control.Izquierda);
+//  Serial.print(J1.Control.Derecha);
+//  Serial.print(J1.Control.Acelerador);
+//  Serial.print(J1.Control.Freno);
+//  Serial.print(J1.Control.Drift);
+//  Serial.print(J2.Control.Izquierda);
+//  Serial.print(J2.Control.Derecha);
+//  Serial.print(J2.Control.Acelerador);
+//  Serial.print(J2.Control.Freno);
+//  Serial.println(J2.Control.Drift);
+ 
   //Primero creamos la variable que nos dice si el usuario toco un boton
-  J1.accion =!digitalRead(J1.Control.Acelerador) | !digitalRead(J1.Control.Freno);
-  J2.accion =!digitalRead(J2.Control.Acelerador) | !digitalRead(J2.Control.Freno);
+  J1.accion =J1.Control.Acelerador | J1.Control.Freno;
+  J2.accion =J2.Control.Acelerador | J2.Control.Freno;
   Actualizar_Posicion_HitBox();
   
    
@@ -476,7 +516,7 @@ void Condiciones_Colisones(struct Jugador *carro){
 }
 
 void Giro_Girito(struct Jugador *carro){
-  carro->accion = !digitalRead(carro->Control.Izquierda) | !digitalRead(carro->Control.Derecha);
+  carro->accion = (carro->Control.Izquierda) | (carro->Control.Derecha);
     if(carro->accion && !carro->Giro.enGiro){
       /* El usuario pulso un boton de giro
        * por primera vez
@@ -489,23 +529,23 @@ void Giro_Girito(struct Jugador *carro){
        *     carro->Control.turnoDrift
        */
       
-      if(!carro->Control.turnoDrift && !digitalRead(carro->Control.Drift)){
+      if(!carro->Control.turnoDrift && (carro->Control.Drift)){
         carro->Control.turnoDrift = 1;
         carro->Control.rateGiro   = 20;
                 
-      }else if(carro->Control.turnoDrift && digitalRead(carro->Control.Drift)){
+      }else if(carro->Control.turnoDrift && !(carro->Control.Drift)){
         //carro->Control.turnoDrift = 0
         carro->Control.rateGiro   = 60;
         carro->Control.turnoDrift = 0;
         
       }
              
-      if(digitalRead(carro->Control.Izquierda)&&(millis()-carro->Giro.tGiro)>=carro->Control.rateGiro){
+      if(!(carro->Control.Izquierda)&&(millis()-carro->Giro.tGiro)>=carro->Control.rateGiro){
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         Angulo(carro->Control.Izquierda, carro->Control.Derecha,&carro->Giro.Posicion_Angular_Actual,&carro->Giro.Angulo);
         compVelocidad(carro->Movimiento.Velocidad, carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
         carro->Giro.tGiro = millis();
-      }else if(digitalRead(carro->Control.Derecha)&&(millis()-carro->Giro.tGiro)>=carro->Control.rateGiro){
+      }else if(!(carro->Control.Derecha)&&(millis()-carro->Giro.tGiro)>=carro->Control.rateGiro){
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         Angulo(carro->Control.Izquierda, carro->Control.Derecha,&carro->Giro.Posicion_Angular_Actual,&carro->Giro.Angulo);
         compVelocidad(carro->Movimiento.Velocidad, carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
@@ -520,21 +560,21 @@ void Giro_Girito(struct Jugador *carro){
 
 void accionMovimiento(struct Jugador *carro){
   if(carro->accion){
-    Serial.println("Entro");
+//    Serial.println("Entro");
     //**************************************************************************************************
     //**************************************************************************************************
     //**************************************BOTON DE ACELERADOR*****************************************
     //**************************************************************************************************
     //**************************************************************************************************
     // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
-    if(!digitalRead(carro->Control.Acelerador) && !carro->Movimiento.enMovimiento){
+    if((carro->Control.Acelerador) && !carro->Movimiento.enMovimiento){
       carro->Movimiento.tAceleracion = millis();
       carro->Movimiento.enMovimiento = 1;   
     }
     // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
-    else if(!digitalRead(carro->Control.Acelerador) && carro->Movimiento.enMovimiento){
+    else if((carro->Control.Acelerador) && carro->Movimiento.enMovimiento){
       
-      if(!digitalRead(carro->Control.Acelerador)&&(millis()-carro->Movimiento.tAceleracion)>=40){
+      if((carro->Control.Acelerador)&&(millis()-carro->Movimiento.tAceleracion)>=40){
         Condiciones_Colisones(carro);
          float posX_ini = carro->Movimiento.posX;
          float posY_ini = carro->Movimiento.posY;
@@ -544,13 +584,16 @@ void accionMovimiento(struct Jugador *carro){
          * **********************************Código de Aceleración**************************************
          * ---------------------------------------------------------------------------------------------
          */
-  
+         Serial.print("aVelI:");
+        Serial.print(carro->Movimiento.Velocidad  * 1000);
         carro->Movimiento.Velocidad = carro->Movimiento.Velocidad + carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tAceleracion);
 
         if(carro->Movimiento.Velocidad >= 0.015){
             carro->Movimiento.Velocidad = 0.015;
         }
 
+        Serial.print("aAVelF:");
+        Serial.println(carro->Movimiento.Velocidad  * 1000);
         
         FillRect(150, 42, 2, 47, 0xF800); // Meta
         compVelocidad(carro->Movimiento.Velocidad,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
@@ -560,7 +603,7 @@ void accionMovimiento(struct Jugador *carro){
     }
 
     // Al soltar el acelerador, se sale de las condiciones y no se mueve
-    if(digitalRead(carro->Control.Acelerador)&&carro->Movimiento.enMovimiento){
+    if(!(carro->Control.Acelerador)&&carro->Movimiento.enMovimiento){
       carro->Movimiento.enMovimiento = 0;  
     }
 
@@ -570,16 +613,16 @@ void accionMovimiento(struct Jugador *carro){
     //**************************************************************************************************
     //**************************************************************************************************
     // Se determina el tiempo inicial de la duracion del movimiento (Al acelerar)
-    Serial.println(carro->Movimiento.enFrenado);
-    if(!digitalRead(carro->Control.Freno) && !carro->Movimiento.enFrenado){
-      Serial.println("Frenando");
+    //Serial.println(carro->Movimiento.enFrenado);
+    if((carro->Control.Freno) && !carro->Movimiento.enFrenado){
+      //Serial.println("Frenando");
       carro->Movimiento.tFrenado = millis();
       carro->Movimiento.enFrenado = 1;   
     }
     // Se realiza el movimiento, tomando en cuenta la referencia del tiempo anterior (Mientras se acelera)
-    else if(!digitalRead(carro->Control.Freno) && carro->Movimiento.enFrenado){
+    else if((carro->Control.Freno) && carro->Movimiento.enFrenado){
       
-      if(!digitalRead(carro->Control.Freno)&&(millis()-carro->Movimiento.tFrenado)>=40){
+      if((carro->Control.Freno) && (millis()-carro->Movimiento.tFrenado)>=40){
          Condiciones_Colisones(carro);
          float posX_ini = carro->Movimiento.posX;
          float posY_ini = carro->Movimiento.posY;
@@ -589,12 +632,16 @@ void accionMovimiento(struct Jugador *carro){
          * **********************************Código de Frenado******************************************
          * ---------------------------------------------------------------------------------------------
          */
-  
+        Serial.print("FVelI:");
+        Serial.print(carro->Movimiento.Velocidad  * 1000);
         carro->Movimiento.Velocidad = carro->Movimiento.Velocidad - 2*carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tFrenado);
-
+                
         if(carro->Movimiento.Velocidad <= 0){
             carro->Movimiento.Velocidad = 0;
         }
+
+        Serial.print("FVelF:");
+        Serial.println(carro->Movimiento.Velocidad   * 1000);
 
         
         FillRect(150, 42, 2, 47, 0xF800); // Meta
@@ -605,7 +652,7 @@ void accionMovimiento(struct Jugador *carro){
     }
 
     // Al soltar el acelerador, se sale de las condiciones y no se mueve
-    if(digitalRead(carro->Control.Freno)&&carro->Movimiento.enFrenado){
+    if(!(carro->Control.Freno)&&carro->Movimiento.enFrenado){
       carro->Movimiento.enFrenado = 0;  
     }
     
@@ -615,7 +662,7 @@ void accionMovimiento(struct Jugador *carro){
       carro->Movimiento.tAceleracion = millis();
       carro->Movimiento.enMovimiento = 1;  
     }
-    else if(carro->Movimiento.enMovimiento == 1 && (millis()-carro->Movimiento.tAceleracion)>=2){
+    else if(carro->Movimiento.enMovimiento == 1 && (millis()-carro->Movimiento.tAceleracion)>=40){
 
       Condiciones_Colisones(carro);
       
@@ -624,15 +671,19 @@ void accionMovimiento(struct Jugador *carro){
       float  vel_ini = carro->Movimiento.Velocidad;
       
       
-      carro->Movimiento.Velocidad = vel_ini - carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tAceleracion)*50;
+      carro->Movimiento.Velocidad = vel_ini - carro->Movimiento.Aceleracion*(millis()-carro->Movimiento.tAceleracion)*0.99;
       
         if(carro->Movimiento.Velocidad <= 0){
            carro->Movimiento.Velocidad = 0;
+           
         }
+
+      Serial.print("Desa");
+      Serial.println(carro->Movimiento.Velocidad);
       
       FillRect(150, 42, 2, 47, 0xF800); // Meta
-      compVelocidad(carro->Movimiento.Velocidad*1000,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
-      movimientoCarro(posX_ini,posY_ini,40, carro->Movimiento.velX/1000, carro->Movimiento.velY/1000, &carro->Movimiento.posX,&carro->Movimiento.posY);   
+      compVelocidad(carro->Movimiento.Velocidad,carro->Giro.Angulo, &carro->Movimiento.velX, &carro->Movimiento.velY);
+      movimientoCarro(posX_ini,posY_ini,40, carro->Movimiento.velX, carro->Movimiento.velY, &carro->Movimiento.posX,&carro->Movimiento.posY);   
       
       
       
