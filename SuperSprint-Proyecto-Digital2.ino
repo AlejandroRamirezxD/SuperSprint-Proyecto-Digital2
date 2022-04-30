@@ -38,6 +38,8 @@ File archivo, fondo;
 
 char selArch, modo, modoInit, gameMode;
 
+int compMetaX;
+
 // Sub struct de la variables relacionadas al mando 
 struct control{
   int Izquierda;
@@ -85,13 +87,22 @@ struct hitBox{
   coordenada d;
 };
 
+//Hacemos un struct para ver el estado de vuelta del jugador
+struct lapStatus{
+  int maxLaps;
+  int currentLap;
+  int checkpoint;  
+};
+
 // Super struct que contiene a los sub structs
 struct Jugador{
   hitBox HitBox;
   control Control;
   giro Giro;
   movimiento Movimiento;
+  lapStatus LapStatus;
   int accion;
+  int identificador;
 }J1,J2;
 
 struct Linea{
@@ -113,6 +124,9 @@ unsigned long tRefLCD;
 unsigned long  tRefLCD_2 ;
 
 int drawJ1, drawJ2, choque;
+#define Rola1 PD_6
+#define Rola2 PD_7
+#define ResetR PF_4
 
 // Struct dedicado a los limites de pista 1
 struct Pista{
@@ -144,6 +158,10 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x632C);
+
+  pinMode(Rola1, OUTPUT);
+  pinMode(Rola2, OUTPUT);
+  pinMode(ResetR, OUTPUT);
 
   //Inicialización de la SD
   //Iniciamos la comunicación serial SPI
@@ -244,6 +262,17 @@ void setup() {
   J1.Giro.Angulo = 0;
   compVelocidad(J1.Movimiento.Velocidad, J1.Giro.Angulo, &J1.Movimiento.velX, &J1.Movimiento.velY);
 
+  //Límites de la línea de meta
+  compMetaX = 151;
+  Meta.HitBox.a.x = 150;
+  Meta.HitBox.a.y = 42;
+  Meta.HitBox.b.x = 150+2;
+  Meta.HitBox.b.y = 42;
+  Meta.HitBox.c.x = 150;
+  Meta.HitBox.c.y = 42+31;
+  Meta.HitBox.d.x = 150+2;;
+  Meta.HitBox.d.y = 42+31;
+
   //Variable de refresco
   tRefLCD = millis();
   drawJ1 = 0;
@@ -253,10 +282,38 @@ void setup() {
   modo = 1;
   modoInit = 0;
   gameMode = 1;
+
+  //Definimos identificadores
+  J1.identificador = 1;
+  J2.identificador = 2;
+  
+  digitalWrite(ResetR, LOW);
+  digitalWrite(Rola1,LOW);
+  digitalWrite(ResetR, HIGH);
 }
 //***************************************************************************************************************************************
 // LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP
 //***************************************************************************************************************************************
+
+
+void RolaJuego(){
+  digitalWrite(Rola1,HIGH);
+  digitalWrite(Rola2,LOW);
+  digitalWrite(ResetR, HIGH);
+}
+
+void RolaMoneda(){
+  digitalWrite(Rola2,HIGH);
+  digitalWrite(Rola1,LOW);
+  digitalWrite(ResetR, HIGH);
+}
+
+void ReserRola(){
+  digitalWrite(ResetR, LOW);
+  digitalWrite(Rola1,LOW);
+   digitalWrite(Rola2,LOW);
+}
+
 void loop() {
   verificacion_Botones();
   switch(modo){
@@ -270,7 +327,7 @@ void loop() {
       modo_1J();
     break;
     case 4:
-      inicio();
+      modo_2J();
     break;
     default:
       modo = 1;
@@ -316,7 +373,7 @@ void Actualizar_Posicion_HitBox(){
   J2.HitBox.d.x = J2.Movimiento.posX + 32;
   J2.HitBox.d.y = J2.Movimiento.posY + 32;
   
-  /*
+  /*cc
   Serial.print("PosX: ");
   Serial.print(J1.Movimiento.posX);
   Serial.print("PosY: ");
@@ -341,6 +398,45 @@ void Actualizar_Posicion_HitBox(){
   Serial.print(J1.HitBox.d.x);
   Serial.print(",");
   Serial.println(J1.HitBox.d.y);*/
+}
+
+void calculoVuelta(struct Jugador *carro, int xMeta){
+  int posXbanderaJ1[4] = {0,20,40,60};
+  int posXbanderaJ2[4] = {240,260,280,300};
+  int compY = 0;
+
+  
+  if( carro->HitBox.a.x <= 151 && carro->HitBox.a.y <= Pista1.Limites.yf && carro->HitBox.a.y >= Pista1.Limites.yif && (carro->Giro.Angulo <90 || carro->Giro.Angulo > 270)){
+    carro->LapStatus.checkpoint = 1;
+  }
+  
+  if(carro->HitBox.a.x<=xMeta && carro->HitBox.a.y >= Pista1.Limites.yo && carro->HitBox.a.y <= Pista1.Limites.yio && carro->Giro.Angulo >90 && carro->Giro.Angulo < 270 && carro->LapStatus.checkpoint){
+    carro->LapStatus.currentLap++;
+    if(carro->identificador == 1){
+      fondo = SD.open("selmode.txt");
+      SD_to_LCD(posXbanderaJ1[carro->LapStatus.currentLap-2],0,16,16,fondo);
+    }
+    if(carro->identificador == 2){
+      fondo = SD.open("selmode.txt");
+      SD_to_LCD(posXbanderaJ2[carro->LapStatus.currentLap-2],0,16,16,fondo);  
+    }
+    carro->LapStatus.checkpoint = 0;
+
+    if(carro->LapStatus.currentLap > 4){
+      if(carro->identificador == 1){
+        LCD_Print("J1 GANA!!",50,100,2,0xffff,0x0196);
+      }
+      if(carro->identificador == 2){
+        LCD_Print("J2 GANA!!",50,100,2,0xffff,0x0196);
+      }
+      //LCD_Print("Presione el Acelerador",120,100,1,0xffff,0x0196);
+      while(!J1.Control.Acelerador || !J2.Control.Acelerador){
+        verificacion_Botones();  
+      }
+      modo = 1;
+    }
+  }
+
 }
 
 void Condiciones_Colisones(struct Jugador *carro){
@@ -525,7 +621,8 @@ void accionMovimiento(struct Jugador *carro){
     else if(carro->Control.Acelerador && carro->Movimiento.enMovimiento){
       
       if(carro->Control.Acelerador && (millis()-carro->Movimiento.tAceleracion)>=40){
-        Condiciones_Colisones(carro);
+         Condiciones_Colisones(carro);
+         calculoVuelta(carro, compMetaX);
          float posX_ini = carro->Movimiento.posX;
          float posY_ini = carro->Movimiento.posY;
          float  vel_ini = carro->Movimiento.Velocidad;
@@ -571,6 +668,7 @@ void accionMovimiento(struct Jugador *carro){
       
       if(carro->Control.Freno&&(millis()-carro->Movimiento.tFrenado)>=40){
          Condiciones_Colisones(carro);
+         calculoVuelta(carro, compMetaX);
          float posX_ini = carro->Movimiento.posX;
          float posY_ini = carro->Movimiento.posY;
          float  vel_ini = carro->Movimiento.Velocidad;
@@ -804,7 +902,7 @@ void menu(){
     //Imprimimos el menu
     fondo = SD.open("menu.txt");
     SD_to_LCD(0,0,320,240,fondo);
-    LCD_Print("1 Jugador", 85, 140, 2, 0xffff, 0x0196);
+    LCD_Print("Practica", 85, 140, 2, 0xffff, 0x0196);
     LCD_Print("2 Jugadores", 75, 170, 2, 0xffff, 0x0196);
     //Indicamos que se ha salido de la inicialización del modo
     modoInit = 1;  
@@ -832,7 +930,9 @@ void menu(){
       fondo = SD.open("selmode.txt");
       FillRect(60, 140, 16, 40, 0x0196);
       SD_to_LCD(bitmapX,bitmapY[gameMode-1],16,16,fondo);
-      while(J1.Control.Derecha);  
+      while(J1.Control.Derecha){
+        verificacion_Botones();
+      }  
     } 
   }
 }
@@ -850,11 +950,48 @@ void modo_1J(){
     //Imprimimos la pista
     fondo = SD.open("pista1.txt");
     SD_to_LCD(0,0,320,240,fondo);
+    RolaJuego();
     //Indicamos que la inicialización ha terminado
     modoInit = 1;
   }
   else{
     //Se ejecuta el código del juego
+    verificacion_Botones();
+    if(J2.Control.Acelerador == 1){
+      modo = 1;  
+    }
+    //Primero creamos la variable que nos dice si el usuario toco un boton
+    J1.accion = J1.Control.Acelerador | J1.Control.Freno;
+    Actualizar_Posicion_HitBox();
+   
+    //choque  = 0;
+    accionMovimiento(&J1);
+  
+    Giro_Girito(&J1);
+  
+    
+  
+    // CarritoConPrivilegios
+    if(!drawJ1 && !tRefLCD_2){
+      drawJ1 = 1;
+      tRefLCD = millis();
+    }else if((millis() - tRefLCD )>25){
+      LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+    }else if((millis() - tRefLCD )>25 && drawJ1 == 1){
+      drawJ1 = 0;
+      tRefLCD_2 = (millis() - tRefLCD );
+    }
+    
+    if(!drawJ2 && tRefLCD_2 > 25){
+      drawJ2 = 1;
+      tRefLCD = millis();
+    }else if((millis() - tRefLCD )>50){
+      LCD_Sprite(J1.Movimiento.posX,J1.Movimiento.posY,16,16,CarritoConPrivilegios,32,J1.Giro.Posicion_Angular_Actual,0,0);
+      
+    }else if((millis() - tRefLCD )>25 && drawJ2 == 1){
+      drawJ2 = 0;
+      tRefLCD_2 = 0;
+    }
   }
 }
 //****************************************************************************************
@@ -870,6 +1007,7 @@ void modo_2J(){
     //Imprimimos la pista
     fondo = SD.open("pista1.txt");
     SD_to_LCD(0,0,320,240,fondo);
+    RolaJuego();
     //Indicamos que la inicialización ha terminado
     modoInit = 1;
   }
@@ -880,18 +1018,6 @@ void modo_2J(){
     J1.accion = J1.Control.Acelerador | J1.Control.Freno;
     J2.accion = J2.Control.Acelerador | J2.Control.Freno;
     Actualizar_Posicion_HitBox();
-    
-    
-    Meta.HitBox.a.x = 150;
-    Meta.HitBox.a.y = 42;
-    Meta.HitBox.b.x = 150+2;
-    Meta.HitBox.b.y = 42;
-    Meta.HitBox.c.x = 150;
-    Meta.HitBox.c.y = 42+31;
-    Meta.HitBox.d.x = 150+2;;
-    Meta.HitBox.d.y = 42+31;
-  
-    
    
     //choque  = 0;
     accionMovimiento(&J1);
@@ -918,6 +1044,7 @@ void modo_2J(){
       tRefLCD = millis();
     }else if((millis() - tRefLCD )>50){
       LCD_Sprite(J2.Movimiento.posX,J2.Movimiento.posY,16,16,CarritoSinPrivilegios,32,J2.Giro.Posicion_Angular_Actual,0,0);
+      
     }else if((millis() - tRefLCD )>25 && drawJ2 == 1){
       drawJ2 = 0;
       tRefLCD_2 = 0;
