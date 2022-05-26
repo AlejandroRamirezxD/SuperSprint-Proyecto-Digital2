@@ -425,6 +425,7 @@ void calculoVuelta(struct Jugador *carro, int xMeta){
     if(carro->LapStatus.currentLap > 4){
       if(carro->identificador == 1){
         LCD_Print("J1 GANA!!",50,100,2,0xffff,0x0196);
+        carro->LapStatus.currentLap = 0;
       }
       if(carro->identificador == 2){
         LCD_Print("J2 GANA!!",50,100,2,0xffff,0x0196);
@@ -434,6 +435,9 @@ void calculoVuelta(struct Jugador *carro, int xMeta){
         verificacion_Botones();  
       }
       modo = 1;
+      modoInit = 0;
+      gameMode = 1;
+      
     }
   }
 
@@ -951,6 +955,36 @@ void modo_1J(){
     fondo = SD.open("pista1.txt");
     SD_to_LCD(0,0,320,240,fondo);
     RolaJuego();
+
+    // Definir pos inicial de carrito 
+    J1.Movimiento.posX = 50+5;
+    J1.Movimiento.posY = 170+5;
+    J2.Movimiento.posX = 50+5;
+    J2.Movimiento.posY = 190+5;
+
+    // Valores de maniobra
+    J1.Control.rateGiro   = 60;
+    J1.Control.turnoDrift = 0;
+    J1.Movimiento.Velocidad =  0;
+    J1.Movimiento.Aceleracion = 0.0000001;
+  
+     // Valores de maniobra
+    J2.Control.rateGiro   = 80;
+    J2.Control.turnoDrift = 0;
+    J2.Movimiento.Velocidad =  0;
+    J2.Movimiento.Aceleracion = 0.0000001;
+  
+    // Variables para entrar en las condiciones
+    J1.Giro.enGiro = 0;
+    J1.Movimiento.enMovimiento = 0;
+    J1.Movimiento.enFrenado = 0;
+    J1.Movimiento.tRebote = 0;
+  
+    J2.Giro.enGiro = 0;
+    J2.Movimiento.enMovimiento = 0;
+    J2.Movimiento.enFrenado = 0;
+    J2.Movimiento.tRebote = 0;
+    
     //Indicamos que la inicialización ha terminado
     modoInit = 1;
   }
@@ -1008,6 +1042,37 @@ void modo_2J(){
     fondo = SD.open("pista1.txt");
     SD_to_LCD(0,0,320,240,fondo);
     RolaJuego();
+
+    
+    // Definir pos inicial de carrito 
+    J1.Movimiento.posX = 50+5;
+    J1.Movimiento.posY = 170+5;
+    J2.Movimiento.posX = 50+5;
+    J2.Movimiento.posY = 190+5;
+
+    // Valores de maniobra
+    J1.Control.rateGiro   = 60;
+    J1.Control.turnoDrift = 0;
+    J1.Movimiento.Velocidad =  0;
+    J1.Movimiento.Aceleracion = 0.0000001;
+  
+     // Valores de maniobra
+    J2.Control.rateGiro   = 80;
+    J2.Control.turnoDrift = 0;
+    J2.Movimiento.Velocidad =  0;
+    J2.Movimiento.Aceleracion = 0.0000001;
+  
+    // Variables para entrar en las condiciones
+    J1.Giro.enGiro = 0;
+    J1.Movimiento.enMovimiento = 0;
+    J1.Movimiento.enFrenado = 0;
+    J1.Movimiento.tRebote = 0;
+  
+    J2.Giro.enGiro = 0;
+    J2.Movimiento.enMovimiento = 0;
+    J2.Movimiento.enFrenado = 0;
+    J2.Movimiento.tRebote = 0;
+    
     //Indicamos que la inicialización ha terminado
     modoInit = 1;
   }
